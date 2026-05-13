@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+
+.letter-wide {
+  letter-spacing: 0.1em; 
+}
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #1A1A1A inset !important;
+  -webkit-text-fill-color: #D4D4D8 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+::-webkit-scrollbar{
+  display: none;
+}
