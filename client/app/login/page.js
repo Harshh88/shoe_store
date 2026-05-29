@@ -3,8 +3,10 @@
 import { useState } from "react";
 import LogIn from "./LogIn"
 import { login } from "@/services/authService";
+import { useRouter } from "next/navigation";
 
 export default function Login(){
+    const router = useRouter();
     const intialState = {
         email: "",
         password: ""
@@ -32,6 +34,7 @@ export default function Login(){
             localStorage.setItem("token",token);
             console.log(response);
             setFormData(intialState);
+            router.push("/");
             alert("Login successfull");
             }
         }catch(err){
