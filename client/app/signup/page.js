@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { signup } from "@/services/authService";
 import SignUp from "./SignUp";
+import { useRouter } from "next/navigation";
 
 export default function AuthSignUp() {
+  const router = useRouter();
   const initialState = {
     name: "",
     email: "",
@@ -34,6 +36,7 @@ export default function AuthSignUp() {
       const response = await signup(formData);
       console.log(response.data.user);
       setFormData(initialState);
+      router.push("/login");
     } catch (err) {
         console.log("Signup error",err);
     }finally{
