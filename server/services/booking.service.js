@@ -33,6 +33,7 @@ const getBookings = async(seller_id) => {
    return shopAllBookings.rows;
 }
 
+
 const confirmBooking = async(id) => {
   const booking = await pool.query(
     `SELECT * FROM bookings WHERE id=$1`,[id]

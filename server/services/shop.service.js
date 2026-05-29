@@ -56,4 +56,11 @@ const fetchShopUser = async({shop_id}) => {
       return shop.rows[0];
 }
 
-module.exports = {fetchAllShops,fetchShopUser,getSingleShop};
+const fetchUserShop = async({user_id}) => {
+    const result = await pool.query(`
+        SELECT s.id FROM shops s WHERE user_id=$1
+        `,[user_id])
+        return result.rows[0]
+}
+
+module.exports = {fetchAllShops,fetchShopUser,getSingleShop,fetchUserShop};

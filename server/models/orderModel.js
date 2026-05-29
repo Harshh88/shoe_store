@@ -1,9 +1,9 @@
 const pool = require("../config/db");
 
-const createTable = async() => {
-    try{
-        await pool.query(
-            `
+const createTable = async () => {
+  try {
+    await pool.query(
+      `
             CREATE TABLE IF NOT EXISTS orders(
              id SERIAL PRIMARY KEY,
              address_id INTEGER NOT NULL,
@@ -17,19 +17,41 @@ const createTable = async() => {
              FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE,
              FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
-            `
-        )
-        console.log("order model created successfully");
-        await pool.query(
-            `
+            `,
+    );
+    console.log("order model created successfully");
+    await pool.query(
+      `
             ALTER TABLE orders
             ADD COLUMN IF NOT EXISTS razorpay_order_id VARCHAR(100)
-            `
-        )
-    }
-    catch(err){
-        console.log("err in order model",err);
-    }
-}
+            `,
+    );
+    await pool.query(
+      `
+            ALTER TABLE orders
+            ADD COLUMN IF NOT EXISTS shop_id INTEGER
+            `,
+    );
+    await pool.query(
+      `
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.table_constraints
+            WHERE constraint_name = 'fk_shop'
+        ) THEN
+            ALTER TABLE orders
+            ADD CONSTRAINT fk_shop
+            FOREIGN KEY (shop_id) REFERENCES shops(id);
+        END IF;
+    END
+    $$;
+    `,
+    );
+  } catch (err) {
+    console.log("err in order model", err);
+  }
+};
 
 module.exports = createTable;

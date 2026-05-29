@@ -46,4 +46,9 @@ const createOrderItem = async(cart_items,order_id) => {
     return idArr;
 }
 
-module.exports = {formSubmit,createOrder,createOrderItem};
+const getOrders = async(shop_id) => {
+    const result = await pool.query(`SELECT * FROM orders WHERE shop_id=$1`,[shop_id]);
+    return result.rows;
+}
+
+module.exports = {formSubmit,createOrder,createOrderItem,getOrders};

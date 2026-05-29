@@ -3,7 +3,7 @@ const {productQueryMap} = require("../utils/productQueryBuilder");
 
 const fetchAllProducts = async({shop_id,limit}) =>{
     const limitValue = parseInt(limit);
-    const validLimit = !isNaN(limitValue && limitValue > 0);
+    const validLimit = !isNaN(limitValue) && limitValue > 0;
     let values = [shop_id];
 
     const key = "productWithoutLimit";

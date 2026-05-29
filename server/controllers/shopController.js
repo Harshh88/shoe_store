@@ -19,7 +19,7 @@ const getAllShops = async (req,res) => {
 
   } catch (err) {
     console.log("something error in shopController", err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
     })

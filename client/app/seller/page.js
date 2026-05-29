@@ -10,31 +10,7 @@ export default function Admin() {
   const [sellerToken, setSellerToken] = useState(null);
   const [btnFlag, setBtnFlag] = useState(false);
   const router = useRouter();
-  const fetchBookings = async () => {
-    try {
-      setBtnFlag(true);
-      const response = await api.post(
-        "/booking/seller/get-bookings",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${sellerToken}`,
-          },
-        },
-      );
-      //   console.log(response.data.getAllBookings);
-      if (response.data.getAllBookings === undefined) {
-        console.log("sorry no bookings on your shop");
-        setBtnFlag(false);
-        return;
-      }
-      setAllBookings(response.data.getAllBookings);
-      console.log(response.data.getAllBookings);
-    } catch (err) {
-      console.log("something error in fetchbookings", err);
-      setBtnFlag(false);
-    }
-  };
+
   const confirmBookings = async (id) => {
     try {
       const res = await api.put(
@@ -77,25 +53,7 @@ export default function Admin() {
       }
     }
   }
-  useEffect(() => {
-    try {
-      const existToken = localStorage.getItem("sellerToken");
-      if (!existToken) {
-        router.push("/seller/login");
-        return;
-      }
-      const decoded = jwtDecode(existToken);
-      if (decoded.role !== "SELLER") {
-        alert("only seller or admin can access");
-        router.push("/seller/login");
-      }
-      // console.log(existToken);
-      setSellerToken(existToken);
-    } catch (err) {
-      console.log(err);
-      router.push("/seller/login");
-    }
-  }, []);
+ 
   return (
     <div className="text-white">
       <div className="flex">

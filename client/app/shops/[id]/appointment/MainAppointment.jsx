@@ -1,47 +1,76 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
 
-const BookingPage = ({bookingShop}) => {
+const BookingPage = ({ bookingShop, onBookingSubmit }) => {
+  const [currentYear] = useState(2026);
+  const [currentMonth] = useState(10);
   const [selectedDate, setSelectedDate] = useState(9);
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
-  
-  const name_parts = bookingShop.name.split(" ");
-  const [first_name, ...remain_name] = bookingShop.name.split(" ");
+  const [loading, setLoading] = useState(false);
 
+  const name_parts = bookingShop?.name ? bookingShop.name.split(" ") : ["Shop"];
+  const first_name = name_parts[0];
+  const remain_name = name_parts.slice(1).join(" ");
 
   const timeSlots = [
     { time: '10:00 AM', available: true },
     { time: '11:30 AM', available: true },
-    { time: '01:00 PM', available: false },
+    { time: '01:00 PM', available: true },
     { time: '02:30 PM', available: true },
     { time: '04:00 PM', available: true },
-    { time: '05:30 PM', available: false },
+    { time: '05:30 PM', available: true },
   ];
+
+  const convertTimeTo24h = (timeStr) => {
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    if (hours === '12') hours = '00';
+    if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+    return `${hours}:${minutes}:00`;
+  };
+
+  const handleFinalConfirm = async () => {
+    if (!onBookingSubmit) return;
+    setLoading(true);
+
+    try {
+      const dayString = String(selectedDate).padStart(2, '0');
+      const monthString = String(currentMonth).padStart(2, '0');
+      const time24h = convertTimeTo24h(selectedTime);
+      const finalTimestamp = `${currentYear}-${monthString}-${dayString} ${time24h}`;
+
+      const response = await onBookingSubmit(finalTimestamp);
+      
+      if (response && response.success) {
+        alert("🎉 Appointment Booked Successfully!");
+      } else {
+        alert("Booking failed: " + response?.message);
+      }
+    } catch (error) {
+      alert("Error booking appointment.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full text-white font-sans selection:bg-[#E2FB6C] selection:text-black">
-      
-      {/* Top Navigation Bar - Immersive & Minimal */}
       <nav className="flex justify-between items-center px-4 py-10 max-w-[1400px] mx-auto">
         <button className="group flex items-center gap-3 text-zinc-500 hover:text-[#E2FB6C] transition-all text-[10px] font-black tracking-[0.3em] uppercase">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> 
           Back to Shops
         </button>
         <div className="text-2xl font-black italic text-[#F7FFB0] tracking-tighter uppercase leading-none">
-          KINETIC<span className="text-[#F7FFB0]"></span>
+          KINETIC
         </div>
       </nav>
 
       <main className="max-w-[1400px] mx-auto px-4 pb-20">
-        
-        {/* Main Hero Section - Merged with Page */}
         <div className="grid lg:grid-cols-12 gap-16 items-start mb-24 mt-4">
-          
-          {/* Visual Side */}
           <div className="lg:col-span-7 relative group">
             <div className="relative h-[500px] rounded-[3rem] overflow-hidden border border-zinc-800/50 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
               <img 
-                src={bookingShop.shop_image} 
+                src={bookingShop.shop_image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
                 alt={bookingShop.name}
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
               />
@@ -49,7 +78,6 @@ const BookingPage = ({bookingShop}) => {
             </div>
           </div>
 
-          {/* Text Side */}
           <div className="lg:col-span-5 pt-8">
             <div className="inline-flex items-center gap-2 bg-zinc-900/80 border border-zinc-800 px-3 py-1.5 rounded-full mb-8">
               <span className="w-1.5 h-1.5 bg-[#E2FB6C] rounded-full animate-pulse" />
@@ -64,32 +92,29 @@ const BookingPage = ({bookingShop}) => {
             <div className="space-y-6 max-w-sm">
               <div className="flex items-center gap-3 text-zinc-400">
                 <MapPin size={18} className="text-[#F7FFB0]" />
-                <span className="text-xs font-bold tracking-widest uppercase">{bookingShop.address}</span>
+                <span className="text-xs font-bold tracking-widest uppercase">{bookingShop.address || "Address details Loading..."}</span>
               </div>
               <p className="text-zinc-500 text-sm leading-relaxed font-medium">
-                {bookingShop.description}
+                {bookingShop.description || "No description provided."}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Booking Controls - Clean Sections */}
         <div className="grid lg:grid-cols-2 gap-24 py-20 border-t border-zinc-900">
-          
-          {/* Calendar Section */}
           <section>
             <header className="flex justify-between items-center mb-12">
               <h3 className="text-xs font-black tracking-[0.4em] uppercase text-zinc-600">01. Select Date</h3>
               <div className="flex items-center gap-6">
                 <button className="p-2 hover:bg-zinc-900 rounded-full transition-colors"><ChevronLeft size={20} /></button>
-                <span className="text-sm font-black italic tracking-tighter uppercase">October 2024</span>
+                <span className="text-sm font-black italic tracking-tighter uppercase">October {currentYear}</span>
                 <button className="p-2 hover:bg-zinc-900 rounded-full transition-colors"><ChevronRight size={20} /></button>
               </div>
             </header>
 
             <div className="grid grid-cols-7 gap-y-4 text-center">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                <div key={day} className="text-[10px] font-black text-zinc-800 mb-4">{day}</div>
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                <div key={`${day}-${index}`} className="text-[10px] font-black text-zinc-800 mb-4">{day}</div>
               ))}
               {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
                 <button
@@ -110,7 +135,6 @@ const BookingPage = ({bookingShop}) => {
             </div>
           </section>
 
-          {/* Time Slot Section */}
           <section>
             <h3 className="text-xs font-black tracking-[0.4em] uppercase text-[#F7FFB0] mb-12">02. Select Time</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -119,7 +143,7 @@ const BookingPage = ({bookingShop}) => {
                   key={slot.time}
                   disabled={!slot.available}
                   onClick={() => setSelectedTime(slot.time)}
-                  className={`group relative h-20 rounded-3xl border  transition-all px-8 flex items-center justify-between
+                  className={`group relative h-20 rounded-3xl border transition-all px-8 flex items-center justify-between
                     ${!slot.available ? 'bg-transparent border-zinc-900 opacity-20 cursor-not-allowed' : 
                       selectedTime === slot.time 
                       ? 'bg-[#F7FFB0] border-[#E2FB6C] text-black' 
@@ -134,12 +158,11 @@ const BookingPage = ({bookingShop}) => {
               ))}
             </div>
 
-            {/* Bottom Summary Bar */}
             <div className="mt-12 p-8 bg-zinc-900/20 border-l-2 border-[#E2FB6C] rounded-r-3xl flex justify-between items-center">
               <div>
                 <p className="text-[10px] text-[#F7FFB0] font-black tracking-[0.2em] uppercase mb-1">Reservation Summary</p>
                 <p className="text-lg font-black italic text-white uppercase tracking-tighter">
-                  Wed, Oct {selectedDate} <span className="text-zinc-600 mx-2">/</span> {selectedTime}
+                  Selected Date: {selectedDate} <span className="text-zinc-600 mx-2">/</span> Slot: {selectedTime}
                 </p>
               </div>
               <div className="h-10 w-10 rounded-full border border-zinc-800 flex items-center justify-center">
@@ -149,14 +172,16 @@ const BookingPage = ({bookingShop}) => {
           </section>
         </div>
 
-        {/* Global Action Button */}
-        <div className=" bottom-10 mt-10">
-          <button className="w-full bg-[#F7FFB0] hover:bg-white text-black py-8 rounded-[2.5rem] font-black italic text-2xl uppercase flex items-center justify-center gap-4 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.4)] group">
-            Confirm Appointment
+        <div className="bottom-10 mt-10">
+          <button 
+            disabled={loading}
+            onClick={handleFinalConfirm}
+            className="w-full bg-[#F7FFB0] hover:bg-white text-black py-8 rounded-[2.5rem] font-black italic text-2xl uppercase flex items-center justify-center gap-4 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.4)] group disabled:opacity-50"
+          >
+            {loading ? "Processing Booking..." : "Confirm Appointment"}
             <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
           </button>
         </div>
-
       </main>
 
       <style jsx>{`

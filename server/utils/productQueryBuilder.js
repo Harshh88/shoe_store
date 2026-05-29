@@ -2,7 +2,7 @@ const productWithoutLimit = (values,validLimit,limitValue) => {
     let query = `SELECT p.*,
                  i.url
                  FROM products p
-                 JOIN images i ON p.image_id = i.id
+                 LEFT JOIN images i ON p.image_id = i.id
                  WHERE p.shop_id=$1
                  
     `
