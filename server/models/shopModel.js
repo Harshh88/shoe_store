@@ -1,8 +1,9 @@
 const pool = require("../config/db");
 
-await pool.query(`CREATE EXTENSION IF NOT EXISTS postgis;`);
+
 const createTable = async () => {
   try {
+    
     await pool.query(
       `CREATE TABLE IF NOT EXISTS shops(
               id SERIAL PRIMARY KEY,
@@ -13,6 +14,8 @@ const createTable = async () => {
               FOREIGN KEY (user_id) REFERENCES users(id)
             )`,
     );
+
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS postgis;`);
     // console.log("shop model created successfully");
     
     await pool.query(
