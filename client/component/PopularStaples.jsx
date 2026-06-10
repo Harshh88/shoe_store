@@ -1,81 +1,171 @@
-const products = [
-  {
-    name: 'CRIMSON RUSH',
-    price: '₹14,999',
-    desc: 'Popular Staples',
-    img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80'
-  },
+"use client";
 
-  {
-    name: 'GHOST WALKER',
-    price: '₹11,499',
-    desc: 'Popular Staples',
-    img: 'https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=800&q=80'
-  },
+import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
-  {
-    name: 'STEALTH X',
-    price: '₹17,999',
-    desc: 'Popular Staples',
-    img: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=800&q=80'
-  },
+export const PopularStaples = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [cartCount, setCartCount] = useState(0); // Optional: if you ever want to track inside this block
+  const router = useRouter();
 
-  {
-    name: 'ALPINE PEAK',
-    price: '₹15,499',
-    desc: 'Popular Staples',
-    img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&q=80'
-  }
-];
+  // Pipeline helper to sync cart context state instantly after adding items
+  const fetchCartCounter = useCallback(async () => {
+    try {
+      const existToken = localStorage.getItem("token");
+      if (!existToken) return;
+      const res = await api.post("/cart/items-price", {}, {
+        headers: { Authorization: `Bearer ${existToken}` }
+      });
+      // Content dynamic count sync trigger event
+      if (res.data?.success && res.data.result) {
+        setCartCount(Number(res.data.result.totalquantity || 0));
+        
+        // Custom Event trigger pipeline: Agar tumhare Global Navbar ko trigger refresh chahiye 
+        // toh ye pure application navbar counter ko bina page refresh ke badal dega.
+        window.dispatchEvent(new Event("cartUpdate"));
+      }
+    } catch (err) {
+      console.log("Error syncing cart metrics:", err);
+    }
+  }, []);
 
-export const PopularStaples = () => (
-  // Main Section with your specific color
-  <section className="bg-[#0E0E0E] text-white p-10 min-h-screen">
-    
-    {/* Header Section */}
-    <div className="flex justify-between items-end mb-12">
-      <h2 className="text-5xl font-black leading-[0.9] italic tracking-tighter">
-        POPULAR <br /> STAPLES
-      </h2>
-      
-      {/* Filter Tabs */}
-      <div className="flex gap-2  p-1.9  ">
-        <button className="bg-[#E2FF66] rounded-full text-black px-8 border border-[#222] py-2 rounded-full text-[11px] font-extrabold uppercase tracking-tight">
-          ALL
-        </button>
-        <button className="px-8 bg-[#161616] rounded-full py-2 text-[11px] border border-[#222] text-gray-500 font-extrabold uppercase tracking-tight hover:text-white transition-colors">
-          RUNNING
-        </button>
-        <button className="px-8 py-2 bg-[#161616] rounded-full text-[11px] border border-[#222] text-gray-500 font-extrabold uppercase tracking-tight hover:text-white transition-colors">
-          LIFESTYLE
-        </button>
+  useEffect(() => {
+    // Fetching exactly 4 items for the sleek homepage layout
+    api.get("/product/global?limit=4")
+      .then((res) => {
+        if (res.data.success) {
+          setProducts(res.data.products);
+        }
+      })
+      .catch((err) => console.log("Error fetching home products", err))
+      .finally(() => setLoading(false));
+
+    fetchCartCounter();
+  }, [fetchCartCounter]);
+
+  // Integrated direct backend implementation method 
+  const addCart = async (productId) => {
+    try {
+      const existToken = localStorage.getItem("token");
+      if (!existToken) {
+        router.push("/login");
+        return;
+      }
+      const response = await api.post("/cart/add-item",
+        { product_id: productId },
+        {
+          headers: { Authorization: `Bearer ${existToken}` }
+        }
+      );
+      if (response.status === 200 || response.data) {
+        alert("Item allocated to cart module successfully.");
+        fetchCartCounter(); // Instant response tracking
+      }
+    } catch (err) {
+      console.log("Error in home addCart process sequence:", err);
+      alert(err.response?.data?.message || "Cart insertion sequence rejected.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-[#0E0E0E] text-gray-500 font-bold tracking-widest text-xs text-center py-20 uppercase animate-pulse">
+        Loading Staples...
       </div>
-    </div>
+    );
+  }
 
-    {/* Product Grid */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-      {products.map((item, i) => (
-        <div key={i} className="flex flex-col gap-4">
-          
-          {/* Card Container - slightly lighter than background to show depth */}
-          <div className="aspect-square bg-[#161616] border border-[#222] flex items-center justify-center rounded-3xl overflow-hidden p-8 group cursor-pointer relative shadow-2xl bg-black">
-             <img 
-               src={item.img} 
-               alt={item.name}
-               className="w-full h-full object-contain group-hover:scale-110 transition duration-700 ease-out" 
-             />
-          </div>
-          
-          {/* Product Info */}
-          <div className="flex justify-between items-start px-2">
-            <div className="space-y-0.5">
-              <h4 className="font-bold text-sm tracking-tight uppercase">{item.name}</h4>
-              <p className="text-[12px] text-gray-500 font-semibold">{item.desc}</p>
-            </div>
-            <span className="font-bold text-sm tracking-tighter">{item.price}</span>
-          </div>
+  return (
+    <section className="bg-[#0E0E0E] text-white px-8 md:px-12 py-16 w-full">
+      
+      {/* Header Container */}
+      <div className="flex justify-between items-end mb-12 border-b border-[#141414] pb-6">
+        <div>
+          <p className="text-[#E2FF66] text-[10px] font-black tracking-widest uppercase mb-1">Curated Selection</p>
+          <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-[0.85]">
+            POPULAR <br /> STAPLES
+          </h2>
         </div>
-      ))}
-    </div>
-  </section>
-);
+        
+        {/* Navigation Action */}
+        <Link 
+          href="/products" 
+          className="bg-[#E2FF66] text-black px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-tight hover:bg-white transition-all duration-300"
+        >
+          View All Products
+        </Link>
+      </div>
+
+      {/* Synchronized Product Display Matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {products.map((item) => {
+          const isOutOfStock = item.stock <= 0;
+
+          return (
+            <div key={item.id} className="group flex flex-col gap-4">
+              
+              {/* Product Frame Showcase */}
+              <div className="aspect-square bg-gradient-to-b from-[#131313] to-[#0A0A0A] border border-[#191919] flex items-center justify-center rounded-[2rem] overflow-hidden p-6 relative transition-all duration-500 group-hover:border-[#2a2a2a]">
+                
+                <div className={`w-full h-full flex items-center justify-center transition-transform duration-700 ease-out group-hover:scale-105 ${isOutOfStock ? "opacity-20 grayscale" : ""}`}>
+                  <img 
+                    src={item.image_url || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600'} 
+                    alt={item.name}
+                    className="max-w-full max-h-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)]" 
+                  />
+                </div>
+
+                {isOutOfStock && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                    <div className="border border-[#222] bg-black/90 px-4 py-1.5 rounded-xl rotate-[-8deg]">
+                      <span className="text-gray-600 font-black text-[11px] tracking-widest uppercase">SOLD OUT</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Cyberpunk Style Bottom Drawer panel on Element Hover */}
+                <div className="absolute bottom-5 left-5 right-5 translate-y-16 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
+                  {!isOutOfStock ? (
+                    <button
+                      onClick={() => addCart(item.id)}
+                      className="w-full bg-[#E2FF66] text-black font-black text-[11px] py-3 rounded-xl uppercase tracking-wider hover:opacity-90 transition-all shadow-lg shadow-[#E2FF66]/5"
+                    >
+                      ADD TO BAG
+                    </button>
+                  ) : (
+                    <button 
+                      disabled
+                      className="w-full bg-[#111] border border-[#222] text-gray-500 font-bold text-[11px] py-3 rounded-xl uppercase tracking-wider cursor-not-allowed"
+                    >
+                      OUT OF STOCK
+                    </button>
+                  )}
+                </div>
+
+              </div>
+              
+              {/* Labels & Cost Data Structure */}
+              <div className="flex justify-between items-start px-2">
+                <div className="space-y-0.5 truncate w-[70%]">
+                  <p className="text-[9px] text-gray-600 font-bold tracking-widest uppercase">
+                    {item.size ? `SIZE: ${item.size}` : "KINETIC CO"}
+                  </p>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-200 uppercase truncate group-hover:text-white transition-colors">
+                    {item.name}
+                  </h4>
+                </div>
+                <span className="font-black text-sm text-white tracking-tight">
+                  ₹{Number(item.price).toLocaleString('en-IN')}
+                </span>
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};

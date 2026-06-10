@@ -17,70 +17,83 @@ import { Footer } from "@/component/HomeFooter";
 export default function Home() {
   const { shops, setShops } = useShop();
 
-  const fetchData = useCallback(() => {
-    const location = localStorage.getItem("location");
-    let existLocation = null;
-    try {
-      existLocation = location ? JSON.parse(location) : null;
-    } catch (err) {
-      existLocation = null;
-      console.log(err);
+   // Optimized Fetch Matrix
+    // -----------------------------------------------------------------
+  // OPTIMIZED LOCATION & SHOP FETCH PIPELINE (WITH USEEFFECT)
+  // -----------------------------------------------------------------
+    useEffect(() => {
+    let initialCoords = null;
+
+    const executeFetchPipeline = async (lat = null, long = null) => {
+      try {
+        const payload = { limit: 6 };
+        if (lat && long) {
+          payload.latitude = lat;
+          payload.longitude = long;
+        }
+
+        const res = await api.post("/shop/nearby", payload);
+        
+        if (res.data?.success && res.data.shops?.length > 0) {
+          // STRICT FILTER: Agar lat-long bheja hai, toh sirf vhi dikhao jo backend se filter hokar aayi hain
+          setShops(res.data.shops);
+          console.log("Strict Nearby Shops Loaded:", res.data.shops);
+        } else {
+          // Fallback: Agar location ON hone par bhi area (5km) me 0 shops mili, ya location OFF hai, tabhi random load karo
+          console.log("No shops nearby or location unavailable. Loading random fallback shops...");
+          const fallbackRes = await api.post("/shop/nearby", { limit: 6 });
+          if (fallbackRes.data?.shops) setShops(fallbackRes.data.shops);
+        }
+      } catch (err) {
+        console.log("Database pipeline query processing error:", err);
+      }
+    };
+
+    // 1. LocalStorage Cache (Instant Load)
+    const savedLocation = localStorage.getItem("location");
+    if (savedLocation) {
+      try {
+        initialCoords = JSON.parse(savedLocation);
+        if (initialCoords?.lat && initialCoords?.long) {
+          executeFetchPipeline(initialCoords.lat, initialCoords.long);
+        }
+      } catch (e) {
+        console.log("Cache reading error:", e);
+      }
+    } else {
+      executeFetchPipeline(); // No cache -> Load fallback random instantly
     }
 
-    if (existLocation) {
-      api
-        .post("/shop/nearby", {
-          latitude: existLocation.lat,
-          longitude: existLocation.long,
-          limit:6
-        })
-        .then((res) => {
-          setShops(res.data.shops);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    // 2. Live Runtime Geolocation Prompt
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          if (
+            !initialCoords || 
+            Math.abs(initialCoords.lat - latitude) > 0.001 || 
+            Math.abs(initialCoords.long - longitude) > 0.001
+          ) {
+            // Live precise location milte hi strictly nearby fetch karega
+            await executeFetchPipeline(latitude, longitude);
+            localStorage.setItem(
+              "location",
+              JSON.stringify({ long: longitude, lat: latitude })
+            );
+          }
+        },
+        async (error) => {
+          console.log("Location Denied. Loading random shops:", error.message);
+          await executeFetchPipeline(); // User ne block kiya -> Random load
+        },
+        { enableHighAccuracy: true, timeout: 5000 } // High accuracy true kiya taaki accurate GPS coordinates milein
+      );
+    } else {
+      executeFetchPipeline();
     }
-    console.log("fetchData called");
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        console.log("Location success");
-        const longitude = position.coords.longitude;
-        const latitude = position.coords.latitude;
-        try {
-          const res = await api.post("/shop/nearby", {
-            latitude,
-            longitude,
-            limit:6
-          });
-
-          setShops(res.data.shops);
-          localStorage.setItem(
-            "location",
-            JSON.stringify({ long: longitude, lat: latitude }),
-          );
-          console.log(res.data.shops);
-        } catch (err) {
-          console.log("Api error", err);
-        }
-      },
-      async (error) => {
-        try {
-          const res = await api.post("/shop/nearby",{
-            limit:6
-          });
-          setShops(res.data.shops);
-          console.log(res.data.shops);
-        } catch (err) {
-          console.log("something error in location error function", err);
-        }
-      },
-    );
   }, [setShops]);
-  useEffect(() => {
-    console.log("useEffect running");
-    fetchData();
-  }, [fetchData]);
+  // -----------------------------------------------------------------
 
    const shopss = [
     { name: "The Vault", location: "New York City, NY", tag: "Downtown", image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800" },
@@ -118,6 +131,13 @@ export default function Home() {
       </div>
       <div className="mb-[-12.5rem] bg-[#0E0E0E]">
       <PopularStaples></PopularStaples>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
       </div>
       <Newsletter></Newsletter>
       <Footer></Footer>

@@ -8,22 +8,39 @@ import InventoryDashboard from '@/component/InventoryDashboard';
 import OrderQueueDashboard from '@/component/OrderQueueDashboard';
 import BookingsDashboard from '@/component/BookingsDashboard';
 import ShopProfileDashboard from '@/component/ShopProfileDashboard';
+import AddProductDashboard from '@/component/AddProductDashboard';
 
 export default function CommandCenterDashboard({
   totalBooking,
   totalProducts,
   totalOrder,
   products,
-  orders
+  orders,
+  allBookings,
+  shop,
+  onDeleteShop,
+  onSave,
+  onSubmit,
+  onDeleteProduct,
+  onEditProduct,
+  onConfirmBooking,
+  onCompleteBooking,
+  onCancelBooking,
+  onConfirmOrder,   
+  onShipOrder,      
+  onCancelOrder     
 }) {
   const [activeTab, setActiveTab] = useState('Dashboard');
-  console.log(orders);
 
   const activityData = [
     { type: 'ORDER', title: 'New order from Alex', meta: 'Confirmed • 2 mins ago', value: '+$340.00' },
     { type: 'BOOKING', title: 'Booking confirmed for Tokyo Flagship', meta: 'In-person fitting • 1 hour ago', badge: 'PENDING' },
     { type: 'PRODUCT', title: 'New product: Aero Glide Z2 added', meta: 'Inventory Sync • 4 hours ago', sku: 'SKU: AG-Z2-BLK' }
   ];
+
+  const handleAddProductToggle = () => {
+    setActiveTab('AddProduct');
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -32,13 +49,11 @@ export default function CommandCenterDashboard({
           <div className="flex-1 flex flex-col justify-between">
             <div>
               <Header title="COMMAND_CENTER" subtitle="Global store performance and real-time logistics." />
-
               <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
                 <MetricCard type="CATALOG" value={totalProducts} label="Total Products" isHighlighted={false} />
                 <MetricCard type="VELOCITY" value={totalOrder} label="Total Orders" isHighlighted={true} />
                 <MetricCard type="ENGAGEMENTS" value={totalBooking} label="Bookings" isHighlighted={false} />
               </section>
-
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                 <div className="lg:col-span-3">
                   <RecentActivity activities={activityData} />
@@ -53,26 +68,45 @@ export default function CommandCenterDashboard({
           <InventoryDashboard
             products={products}
             isEmbedded={true}
+            onAddProductClick={handleAddProductToggle}
+            onDeleteProduct={onDeleteProduct} 
+            onEditProduct={onEditProduct}
           />
         );
 
       case 'Orders':
         return (
-          <OrderQueueDashboard
-            orders={orders}
-            isEmbedded={true}
+          <OrderQueueDashboard 
+            orders={orders} 
+            onConfirmOrder={onConfirmOrder}
+            onShipOrder={onShipOrder} // FIXED: shipOrderApi hata kar seedhe onShipOrder kar diya hai
+            onCancelOrder={onCancelOrder}
           />
         );
 
       case 'Bookings':
         return (
-          <BookingsDashboard />
+          <BookingsDashboard 
+            allBookings={allBookings}
+            onConfirmBooking={onConfirmBooking}
+            onCompleteBooking={onCompleteBooking}
+            onCancelBooking={onCancelBooking}
+          />
         );
 
       case 'Shop Profile':
-    return (
-      <ShopProfileDashboard />
-    );
+        return <ShopProfileDashboard shopData={shop} onDelete={onDeleteShop} onSave={onSave}/>;
+
+      case 'AddProduct':
+        return (
+          <AddProductDashboard 
+            onBack={() => setActiveTab('Products')} 
+            onSubmit={(formData) => {
+              onSubmit(formData);
+              setActiveTab('Products');
+            }} 
+          />
+        );
 
       default:
         return (
@@ -86,8 +120,7 @@ export default function CommandCenterDashboard({
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] flex">
-      <Sidebar currentNav={activeTab} onNavChange={setActiveTab} />
-
+      <Sidebar currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} onNavChange={setActiveTab} />
       <main className="flex-1 p-4 sm:p-6 md:p-8 lg:pl-64 max-w-7xl mx-auto w-full flex flex-col justify-between">
         {renderContent()}
       </main>

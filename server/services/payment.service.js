@@ -8,6 +8,7 @@ const razorpay = new Razorpay({
 })
 
 const createPaymentOrder = async(amount) => {
+    console.log("Amount before *100 =", amount);
     const options = {
         amount: amount * 100,
         currency: "INR"

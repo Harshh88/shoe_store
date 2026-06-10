@@ -1,16 +1,27 @@
+"use client";
+
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Clock, MapPin, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const BookingPage = ({ bookingShop, onBookingSubmit }) => {
-  const [currentYear] = useState(2026);
-  const [currentMonth] = useState(10);
-  const [selectedDate, setSelectedDate] = useState(9);
+  // -------------------------------------------------------------
+  // DYNAMIC CALENDAR STATE MANAGEMENT
+  // -------------------------------------------------------------
+  const today = new Date();
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth()); // 0 = Jan, 11 = Dec
+  const [selectedDate, setSelectedDate] = useState(today.getDate());
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
   const [loading, setLoading] = useState(false);
 
   const name_parts = bookingShop?.name ? bookingShop.name.split(" ") : ["Shop"];
   const first_name = name_parts[0];
   const remain_name = name_parts.slice(1).join(" ");
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   const timeSlots = [
     { time: '10:00 AM', available: true },
@@ -20,6 +31,34 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
     { time: '04:00 PM', available: true },
     { time: '05:30 PM', available: true },
   ];
+
+  // -------------------------------------------------------------
+  // CALENDAR CALCULATION UTILITIES
+  // -------------------------------------------------------------
+  // Mahine me total kitne din hain (e.g., 28, 30, 31)
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  
+  // Mahine ki pehli tarikh kis din se shuru ho rhi h (0 = Sunday, 6 = Saturday)
+  const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+
+  // Navigation handlers
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((prev) => prev - 1);
+    } else {
+      setCurrentMonth((prev) => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((prev) => prev + 1);
+    } else {
+      setCurrentMonth((prev) => prev + 1);
+    }
+  };
 
   const convertTimeTo24h = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
@@ -35,7 +74,8 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
 
     try {
       const dayString = String(selectedDate).padStart(2, '0');
-      const monthString = String(currentMonth).padStart(2, '0');
+      // Database tracking standard ke liye month me +1 kiya h kyuki JS me month index 0 se shuru hota h
+      const monthString = String(currentMonth + 1).padStart(2, '0');
       const time24h = convertTimeTo24h(selectedTime);
       const finalTimestamp = `${currentYear}-${monthString}-${dayString} ${time24h}`;
 
@@ -102,13 +142,21 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-24 py-20 border-t border-zinc-900">
+          
+          {/* DYNAMIC CALENDAR SECTION */}
           <section>
             <header className="flex justify-between items-center mb-12">
               <h3 className="text-xs font-black tracking-[0.4em] uppercase text-zinc-600">01. Select Date</h3>
               <div className="flex items-center gap-6">
-                <button className="p-2 hover:bg-zinc-900 rounded-full transition-colors"><ChevronLeft size={20} /></button>
-                <span className="text-sm font-black italic tracking-tighter uppercase">October {currentYear}</span>
-                <button className="p-2 hover:bg-zinc-900 rounded-full transition-colors"><ChevronRight size={20} /></button>
+                <button onClick={handlePrevMonth} className="p-2 hover:bg-zinc-900 rounded-full transition-colors">
+                  <ChevronLeft size={20} />
+                </button>
+                <span className="text-sm font-black italic tracking-tighter uppercase min-w-[140px] text-center">
+                  {monthNames[currentMonth]} {currentYear}
+                </span>
+                <button onClick={handleNextMonth} className="p-2 hover:bg-zinc-900 rounded-full transition-colors">
+                  <ChevronRight size={20} />
+                </button>
               </div>
             </header>
 
@@ -116,25 +164,39 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
                 <div key={`${day}-${index}`} className="text-[10px] font-black text-zinc-800 mb-4">{day}</div>
               ))}
-              {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
-                <button
-                  key={date}
-                  onClick={() => setSelectedDate(date)}
-                  className={`relative group h-14 w-full text-sm font-black transition-all flex items-center justify-center rounded-2xl
-                    ${selectedDate === date 
-                      ? 'text-black z-10' 
-                      : 'text-zinc-500 hover:text-white'
-                    } ${date < 8 ? 'opacity-10 cursor-not-allowed' : ''}`}
-                >
-                  {selectedDate === date && (
-                    <div className="absolute inset-2 bg-[#F7FFB0] rounded-2xl -z-10 shadow-[0_0_20px_rgba(226,251,108,0.4)]" />
-                  )}
-                  {date}
-                </button>
+              
+              {/* 1. Blank padding boxes render honge taaki pehla din sahi column par aaye */}
+              {Array.from({ length: firstDayIndex }).map((_, index) => (
+                <div key={`blank-${index}`} className="h-14 w-full" />
               ))}
+
+              {/* 2. Actual dynamic month days grid map looping */}
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(date => {
+                // Past dates disable block check pipeline (optional protective measure)
+                const isPast = new Date(currentYear, currentMonth, date) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+                return (
+                  <button
+                    key={date}
+                    disabled={isPast}
+                    onClick={() => setSelectedDate(date)}
+                    className={`relative group h-14 w-full text-sm font-black transition-all flex items-center justify-center rounded-2xl
+                      ${selectedDate === date 
+                        ? 'text-black z-10' 
+                        : isPast ? 'text-zinc-800 cursor-not-allowed line-through' : 'text-zinc-500 hover:text-white'
+                      }`}
+                  >
+                    {selectedDate === date && (
+                      <div className="absolute inset-2 bg-[#F7FFB0] rounded-2xl -z-10 shadow-[0_0_20px_rgba(226,251,108,0.4)]" />
+                    )}
+                    {date}
+                  </button>
+                );
+              })}
             </div>
           </section>
 
+          {/* TIME SELECTION SECTION */}
           <section>
             <h3 className="text-xs font-black tracking-[0.4em] uppercase text-[#F7FFB0] mb-12">02. Select Time</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -162,7 +224,7 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
               <div>
                 <p className="text-[10px] text-[#F7FFB0] font-black tracking-[0.2em] uppercase mb-1">Reservation Summary</p>
                 <p className="text-lg font-black italic text-white uppercase tracking-tighter">
-                  Selected Date: {selectedDate} <span className="text-zinc-600 mx-2">/</span> Slot: {selectedTime}
+                  Selected: {selectedDate} {monthNames[currentMonth]} {currentYear} <span className="text-zinc-600 mx-2">/</span> Slot: {selectedTime}
                 </p>
               </div>
               <div className="h-10 w-10 rounded-full border border-zinc-800 flex items-center justify-center">

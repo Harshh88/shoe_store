@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {addBookings,sellerConfirmBooking,sellerCompleteBooking,getUserBookings,getBookingShop} = require("../controllers/bookingController");
+const {addBookings,sellerConfirmBooking,sellerCompleteBooking,getUserBookings,getBookingShop,cancelBothBooking} = require("../controllers/bookingController");
 const auth = require("../middleware/auth");
 // const auth = require("../middleware/auth");
 const isSeller = require("../middleware/isSeller");
@@ -20,14 +20,19 @@ auth,
 isSeller,
 getUserBookings);
 
-router.put("/seller/confirm-bookings",
+router.put("/seller/confirm-bookings/:id",
     auth,
     isSeller,
     sellerConfirmBooking
 )
-router.put("/seller/complete-bookings",
+router.put("/seller/complete-bookings/:id",
     auth,
     isSeller,
     sellerCompleteBooking
+)
+router.put("/cancel-bookings/:id",
+    auth,
+    isSeller,
+    cancelBothBooking
 )
 module.exports = router;

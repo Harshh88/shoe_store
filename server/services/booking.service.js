@@ -39,22 +39,30 @@ const confirmBooking = async(id) => {
     `SELECT * FROM bookings WHERE id=$1`,[id]
   )
   if(booking.rows.length === 0){
-    throw{message: "booking not found",status:404}
+    const err = new Error("booking not found");
+    err.status = 404;
+    throw err;
   }
   if(booking.rows[0].status !== "pending"){
-    throw{message: "booking is not pending",status:409}
+    const err = new Error("booking is not pending")
+    err.status = 409;
+    throw err;
   }
   const res = await pool.query(
     `
     UPDATE bookings
     SET status='confirmed'
     WHERE id=$1 AND status='pending'
+    RETURNING *
     `,
     [id]
   )
   if(res.rowCount === 0){
-    throw{message: "booking is not found or booking already confirmed",status:404};
+    const err = new Error( "booking is not found or booking already confirmed");
+    err.status = 404;
+    throw err;
   }
+  return res.rows[0];
 }
 
 const completeBooking = async(id) => {
@@ -62,22 +70,58 @@ const completeBooking = async(id) => {
     `SELECT * FROM bookings WHERE id=$1`,[id]
   )
   if(booking.rows.length === 0){
-    throw{message:"booking not found",status:404}
+    const err = new Error("booking not found");
+    err.status = 404;
+    throw err;
   }
   if(booking.rows[0].status !== "confirmed"){
-    throw{message:"booking is not confirmed first confirm then update",status:409}
+    const err = new Error("booking is not confirmed first confirm then update");
+    err.status = 409;
+    throw err;
   }
   const res = await pool.query(
     `
     UPDATE bookings
     SET status='completed'
     WHERE id=$1 AND status='confirmed'
+    RETURNING *
     `,
     [id]
   )
   if(res.rowCount === 0){
-    throw{message:"booking is not found or booking already completed",status:409}
+    const err =  new Error("booking is not found or booking already completed");
+    err.status = 409;
+    throw err;
   }
+  return res.rows[0];
 }
 
-module.exports = {createBooking,confirmBooking,completeBooking,getBookings};
+const cancelBooking = async(id) => {
+  const booking = await pool.query(`SELECT * FROM bookings WHERE id=$1`,[id]);
+  if(booking.rows.length === 0){
+    const err = new Error("booking not found");
+    err.status = 404;
+    throw err;
+  }
+  if(booking.rows[0].status !== "pending"){
+    const err = new Error("booking is not pending");
+    err.status = 409;
+    throw err;
+  }
+  const res = await pool.query(
+    `
+    UPDATE bookings
+    SET status='cancelled'
+    WHERE id=$1 AND status='pending'
+    RETURNING *
+    `,[id]
+  )
+  if(res.rowCount === 0){
+    const err = new Error("booking is not found or booking already cancelled");
+    err.status = 409;
+    throw err;
+  }
+  return res.rows[0];
+}
+
+module.exports = {createBooking,confirmBooking,completeBooking,getBookings,cancelBooking};

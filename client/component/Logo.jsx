@@ -1,19 +1,22 @@
 export default function Logo({
     className,
-    marginh1,
     firstEl,
     secondEl,
     thirdEl,
     firstElColor,
     secondElColor,
-    thirdElColor,
-    secondElPadd
-}){
+    thirdElColor
+}) {
     return (
         <div className={`${className}`}>
-            <h1 className={`${marginh1} ${firstElColor}`}>{firstEl}</h1>
-            <span className={`${secondElColor} ${secondElPadd} py-[1rem] italic`}>{secondEl}</span>
-            <span className={`${thirdElColor}`}>{thirdEl}</span>
+            {/* NEON Row */}
+            <h1 className={`${firstElColor} leading-none mb-1`}>{firstEl}</h1>
+            
+            {/* KINETIC V1 Row */}
+            <div className="flex items-baseline leading-none">
+                <span className={`${secondElColor}`}>{secondEl}</span>
+                <span className={`${thirdElColor}`}>{thirdEl}</span>
+            </div>
         </div>
     )
 }

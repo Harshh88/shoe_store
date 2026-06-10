@@ -3,50 +3,70 @@ import React, { useState } from 'react';
 import Sidebar from '@/component/Sidebar';
 import Header from '@/component/Header';
 import AddProductButton from '@/component/AddProductButton';
-import FilterTabs from '@/component/FilterTabs';
 import ProductCard from '@/component/ProductCard';
 import MetricsOverview from '@/component/MetricsOverview';
-import { Currency } from 'lucide-react';
+import EditProductDashboard from './EditProductDashboard'; // Naya component import kiya
 
 export default function InventoryDashboard({ 
-  products, 
-  isEmbedded = false 
+  products = [], 
+  isEmbedded = false,
+  onAddProductClick,
+  onDeleteProduct,
+  onEditProduct
 }) {
-  const [activeTab, setActiveTab] = useState('ALL ITEMS');
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  // const [total,setTotal] = useState(0);
-  // const [total,setTotal] = useState({totalItem:"",totalPrice:""});
-  // console.log(products.length)
-  
-  const totalPrice = products.reduce((acc,curr)=>{
-    return acc + curr.price
-  },0)
+  const [currentView, setCurrentView] = useState('LIST'); // 'LIST' ya 'EDIT'
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const IndianPrice = totalPrice.toLocaleString('en-IN',{
+  const totalPrice = products.reduce((acc, curr) => {
+    return acc + Number(curr.price || 0);
+  }, 0);
+
+  const IndianPrice = totalPrice.toLocaleString('en-IN', {
     style: 'currency',
     currency: 'INR'
-  })
-
-  // const tabsList = ['ALL ITEMS', 'RUNNING', 'BASKETBALL'];
-
+  });
   
   const sampleMetrics = [
     { label: 'INVENTORY VALUE', value: IndianPrice },
     { label: 'TOTAL STOCK', value: products.length },
   ];
 
+  const handleEditClick = (product) => {
+    setSelectedProduct(product);
+    setCurrentView('EDIT');
+  };
+
+  const handleEditSaveSuccess = () => {
+    setCurrentView('LIST');
+    setSelectedProduct(null);
+  };
+
+  if (currentView === 'EDIT' && selectedProduct) {
+    return (
+      <EditProductDashboard 
+        product={selectedProduct}
+        onBack={() => setCurrentView('LIST')}
+        onSubmit={onEditProduct}
+        onSaveSuccess={handleEditSaveSuccess}
+      />
+    );
+  }
+
   const mainLayout = (
-    <div className="flex-1 flex flex-col justify-between w-full">
+    <div className="flex-1 flex flex-col justify-between w-full relative">
       <div>
-        <Header title="INVENTORY" subtitle="MANAGING 24 ACTIVE HIGH-PERFORMANCE LISTINGS" />
+        <Header title="INVENTORY" subtitle="MANAGING ACTIVE HIGH-PERFORMANCE LISTINGS" />
         
-        <AddProductButton isOpen={isAddOpen} onClick={() => setIsAddOpen(!isAddOpen)} />
-        
-        {/* <FilterTabs tabs={tabsList} activeTab={activeTab} onTabChange={setActiveTab} /> */}
+        <AddProductButton isOpen={false} onClick={onAddProductClick} />
         
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id || product._id} 
+              product={product} 
+              onDeleteProduct={onDeleteProduct} 
+              onEditClick={handleEditClick} 
+            />
           ))}
         </section>
       </div>

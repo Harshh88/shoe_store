@@ -49,6 +49,8 @@ const getShopsWithoutLocation = (values, validLimit, limitValue) => {
           i.url AS image
           FROM shops
           LEFT JOIN images i ON shops.id = i.shop_id
+          AND i.is_primary = true
+          ORDER BY RANDOM()
           `;
     if (validLimit) {
       values.push(limitValue);
