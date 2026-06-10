@@ -23,16 +23,17 @@ const order_item_model = require("./models/order_itemModel");
 const imageModel = require("./models/imageModel");
 
 
-userModel();
-shopModel();
-productModel();
-cartModel();
-cart_itemModel();
-bookingModel();
-addressModel();
-orderModel();
-order_item_model();
-imageModel();
+
+await userModel();
+await shopModel();
+await productModel();
+await cartModel();
+await cart_itemModel(); 
+await bookingModel();
+await addressModel();
+await orderModel();
+await order_item_model(); 
+await imageModel();
 
 
 const authRoutes = require("./routes/authRoutes");

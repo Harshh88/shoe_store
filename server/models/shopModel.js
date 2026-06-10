@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 
+await pool.query(`CREATE EXTENSION IF NOT EXISTS postgis;`);
 const createTable = async () => {
   try {
     await pool.query(
@@ -13,7 +14,7 @@ const createTable = async () => {
             )`,
     );
     // console.log("shop model created successfully");
-
+    
     await pool.query(
       `ALTER TABLE shops
              ADD COLUMN IF NOT EXISTS location GEOGRAPHY(Point,4326)
