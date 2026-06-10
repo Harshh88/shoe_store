@@ -24,16 +24,56 @@ const imageModel = require("./models/imageModel");
 
 
 
-await userModel();
-await shopModel();
-await productModel();
-await cartModel();
-await cart_itemModel(); 
-await bookingModel();
-await addressModel();
-await orderModel();
-await order_item_model(); 
-await imageModel();
+userModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+shopModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+productModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+cartModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+cart_itemModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+}); 
+bookingModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+addressModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+orderModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+order_item_model().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+}); 
+imageModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
 
 
 const authRoutes = require("./routes/authRoutes");
