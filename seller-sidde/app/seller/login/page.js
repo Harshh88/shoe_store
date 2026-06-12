@@ -1,74 +1,75 @@
-"use client"
-import { useState } from "react"
-import api from "@/lib/api"
-import { useRouter } from "next/navigation"
-import { jwtDecode } from "jwt-decode"
+"use client";
 
-export default function AdminLogin(){
+import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import api from "@/lib/api";
+import SellerLoginForm from "@/component/SellerLoginForm";
+
+export default function AdminLogin() {
     const router = useRouter();
-    const initalState = {
-        email:"",
-        password:"",
-    }
-    const[formData,setFormData] = useState(initalState);
-    const handleChange = (e)=>{
+    const initialState = {
+        email: "",
+        password: "",
+    };
+
+    const [formData, setFormData] = useState(initialState);
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
-        })
-    }
-    const handleSubmit = async(e)=>{
+        });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
-            const response = await api.post("/seller/login",formData);
-            if(response.status !== 200){
+        setLoading(true);
+
+        try {
+            const response = await api.post("/seller/login", formData);
+            
+            if (response.status !== 200) {
+                setLoading(false);
                 return;
             }
-            // alert("login successfully");
-            let decoded
-            try{
+
+            let decoded;
+            try {
                 decoded = jwtDecode(response.data.token);
-            }
-            catch(e){
+            } catch (err) {
                 alert("Invalid token");
+                setLoading(false);
                 return;
             }
             
-            if(decoded.role !== "SELLER"){
-                alert("only seller can access");
-                setFormData(initalState);
+            if (decoded.role !== "SELLER") {
+                alert("Only seller can access this terminal");
+                setFormData(initialState);
+                setLoading(false);
                 return;
             }
-            localStorage.setItem("sellerToken",response.data.token);
-            console.log(response.data);
-            localStorage.setItem("user",JSON.stringify(response.data.safeUser));
-            if(response.status === 200){
-               router.push("/seller"); 
-            }
-            console.log(response);
-        }catch(err){
-            console.log("something error in seller login function",err);
+
+            localStorage.setItem("sellerToken", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.safeUser));
+            
+            router.push("/seller"); 
+
+        } catch (err) {
+            console.log("Something went wrong in seller login function", err);
+            alert(err.response?.data?.message || "Internal Server Error");
+        } finally {
+            setLoading(false);
         }
-    }
-    return(
-        <form className="text-white" onSubmit={handleSubmit}>
-            <input
-            className="bg-gray-500"
-            type="email"
-            placeholder="enter your email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            />
-            <input
-            className="bg-gray-500 text-white"
-            type="password"
-            placeholder="enter your password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            />
-            <button type="submit">login</button>
-        </form>
-    )
+    };
+
+    return (
+        <SellerLoginForm 
+            formData={formData}
+            loading={loading}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+        />
+    );
 }

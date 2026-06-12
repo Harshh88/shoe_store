@@ -7,18 +7,16 @@ export default function NetworkStatus({ latency, serverLoad }) {
       <h3 className="font-mono font-bold tracking-wider text-xs text-white mb-5">NETWORK_STATUS</h3>
       
       <div className="space-y-4">
-        {/* API Latency Metric Row */}
         <div>
           <div className="flex justify-between text-xs font-bold font-mono mb-1.5">
             <span className="text-zinc-500">API Latency</span>
             <span className="text-white">{latency}ms</span>
           </div>
           <div className="w-full bg-[#1C1C1C] h-1 rounded-full overflow-hidden">
-            <div className="bg-[#D9FA53] h-full" style={{ width: `${Math.min((latency/20)*100, 100)}%` }} />
+            <div className="bg-[#F7FFB0] h-full" style={{ width: `${Math.min((latency/20)*100, 100)}%` }} />
           </div>
         </div>
 
-        {/* Server Workload Capacity Metric Row */}
         <div>
           <div className="flex justify-between text-xs font-bold font-mono mb-1.5">
             <span className="text-zinc-500">Server Load</span>

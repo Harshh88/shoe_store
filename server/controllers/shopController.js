@@ -62,9 +62,15 @@ const createNewShop = async (req, res) => {
       });
     }
 
-    const { name, description, address, contact_number, longitude, latitude, image_url } = req.body;
+    const { name, description, address, contact_number, longitude, latitude } = req.body;
     
-    if (!name || !description || !address || !contact_number) {
+    let image_url = null;
+    if (req.file) {
+      const cloudinaryRes = await uploadOnCloudinary(req.file.path, "shops");
+      image_url = cloudinaryRes?.secure_url || cloudinaryRes?.url || cloudinaryRes;
+    }
+
+    if (!name || !address || !contact_number) {
       return res.status(400).json({
         success: false,
         message: "all required fields must be filled"
@@ -78,12 +84,10 @@ const createNewShop = async (req, res) => {
       contact_number,
       longitude: longitude ? parseFloat(longitude) : 0.0,
       latitude: latitude ? parseFloat(latitude) : 0.0,
-      image_url
+      image_url 
     };
 
-    const {finalShop,token} = await createShop(user_id, data);
-    // console.log("shop",finalShop);
-    // console.log("token",token)
+    const { finalShop, token } = await createShop(user_id, data);
     
     return res.status(201).json({
       success: true,

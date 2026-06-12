@@ -17,7 +17,7 @@ router.get("/:shop_id",
 
 router.post("/get-shop",auth,isSeller,getShopByUserId);
 
-router.post("/add-shop",auth,createNewShop);
+router.post("/add-shop",auth,upload.single("image"),createNewShop);
 
 router.delete("/delete-shop",auth,isSeller,deleteShopBySeller);
 

@@ -10,9 +10,9 @@ import { jwtDecode } from "jwt-decode";
 import api from "@/lib/api";
 
 export default function Seller() {
-  const { allBookings, setAllBookings } = useBooking();
-  const { products, setProducts } = useProducts();
-  const { order, setOrder } = useOrder();
+  const { allBookings = [], setAllBookings } = useBooking();
+  const { products = [], setProducts } = useProducts();
+  const { order = [], setOrder } = useOrder();
   const [shop, setShop] = useState(null); 
   const router = useRouter();
 
@@ -80,9 +80,6 @@ export default function Seller() {
     }
   };
 
-  // ==========================================
-  // NEW ORDER ACTIONS START (CONFIRM, SHIP, CANCEL)
-  // ==========================================
   const confirmOrderApi = async (orderId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
@@ -91,7 +88,7 @@ export default function Seller() {
       });
       if (response.status === 200 || response.data?.success) {
         alert("Order confirmed successfully!");
-        fetchAllOrders(sellerToken); // Orders state refresh karne ke liye
+        fetchAllOrders(sellerToken); 
       }
     } catch (err) {
       console.error("Error confirming order:", err);
@@ -130,9 +127,6 @@ export default function Seller() {
       alert(err.response?.data?.message || "Failed to cancel order");
     }
   };
-  // ==========================================
-  // NEW ORDER ACTIONS END
-  // ==========================================
 
   const deleteShop = async (sellerToken) => {
     try {
@@ -299,12 +293,12 @@ export default function Seller() {
   return (
     <div>
       <MainSeller
-        totalBooking={allBookings.length}
-        totalProducts={products.length}
-        totalOrder={order.length}
-        products={products}
-        orders={order}
-        allBookings={allBookings}
+        totalBooking={allBookings ? allBookings.length : 0}
+        totalProducts={products ? products.length : 0}
+        totalOrder={order ? order.length : 0}
+        products={products || []}
+        orders={order || []}
+        allBookings={allBookings || []}
         shop={shop}
         onDeleteShop={() => deleteShop(localStorage.getItem("sellerToken"))}
         onSave={handleShopSave}
@@ -314,7 +308,6 @@ export default function Seller() {
         onConfirmBooking={confirmBookingApi}
         onCompleteBooking={completeBookingApi}
         onCancelBooking={cancelBookingApi}
-        // Passed Order Props
         onConfirmOrder={confirmOrderApi}
         onShipOrder={shipOrderApi}
         onCancelOrder={cancelOrderApi}

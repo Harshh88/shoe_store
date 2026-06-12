@@ -1,5 +1,6 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import Sidebar from '@/component/Sidebar';
 import Header from '@/component/Header';
 import MetricCard from '@/component/MetricCard';
@@ -14,9 +15,9 @@ export default function CommandCenterDashboard({
   totalBooking,
   totalProducts,
   totalOrder,
-  products,
-  orders,
-  allBookings,
+  products = [],
+  orders = [],
+  allBookings = [],
   shop,
   onDeleteShop,
   onSave,
@@ -31,12 +32,49 @@ export default function CommandCenterDashboard({
   onCancelOrder     
 }) {
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState('VELOCITY'); 
 
-  const activityData = [
-    { type: 'ORDER', title: 'New order from Alex', meta: 'Confirmed • 2 mins ago', value: '+$340.00' },
-    { type: 'BOOKING', title: 'Booking confirmed for Tokyo Flagship', meta: 'In-person fitting • 1 hour ago', badge: 'PENDING' },
-    { type: 'PRODUCT', title: 'New product: Aero Glide Z2 added', meta: 'Inventory Sync • 4 hours ago', sku: 'SKU: AG-Z2-BLK' }
-  ];
+  const dynamicOrders = [...products].reverse().map(p => ({
+    type: 'PRODUCT',
+    title: `New product added: ${p.name || 'Component'}`,
+    meta: `Size: ${p.size || 'Standard'} • Stock: ${p.stock || 0}`,
+    sku: `SKU: PROD-${p.id || p._id || '00'}`,
+    rawDate: p.createdAt || p.updatedAt || 0
+  }));
+
+  const dynamicActivities = [...orders].reverse().map(o => ({
+    type: 'ORDER',
+    title: `Order from ${o.customer || 'Client'}`,
+    meta: `ID: #${o.id || '00'} • Status: ${o.status?.toUpperCase() || 'PENDING'}`,
+    value: `₹${Number(o.total_amount || 0).toLocaleString("en-IN")}`,
+    rawDate: o.createdAt || o.id || 0
+  }));
+
+  const dynamicBookings = [...allBookings].reverse().map(b => ({
+    type: 'BOOKING',
+    title: `Session with ${b.name || 'User'}`,
+    meta: b.booking_datetime ? new Date(b.booking_datetime).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Date Pending',
+    badge: b.status?.toUpperCase() || 'PENDING',
+    rawDate: b.booking_datetime || 0
+  }));
+
+  const combinedActivities = [...dynamicActivities, ...dynamicBookings, ...dynamicOrders];
+
+  const filteredActivities = combinedActivities.filter((activity) => {
+    if (selectedMetric === 'CATALOG') return activity.type === 'PRODUCT';
+    if (selectedMetric === 'VELOCITY') return activity.type === 'ORDER';
+    if (selectedMetric === 'ENGAGEMENTS') return activity.type === 'BOOKING';
+    return true;
+  });
+
+  const latestThreeActivities = filteredActivities.slice(0, 3);
+
+  const handleViewAllRedirect = () => {
+    if (selectedMetric === 'CATALOG') setActiveTab('Products');
+    if (selectedMetric === 'VELOCITY') setActiveTab('Orders');
+    if (selectedMetric === 'ENGAGEMENTS') setActiveTab('Bookings');
+  };
 
   const handleAddProductToggle = () => {
     setActiveTab('AddProduct');
@@ -46,17 +84,35 @@ export default function CommandCenterDashboard({
     switch (activeTab) {
       case 'Dashboard':
         return (
-          <div className="flex-1 flex flex-col justify-between">
-            <div>
+          <div className="flex-1 flex flex-col justify-between w-full">
+            <div className="w-full">
               <Header title="COMMAND_CENTER" subtitle="Global store performance and real-time logistics." />
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-                <MetricCard type="CATALOG" value={totalProducts} label="Total Products" isHighlighted={false} />
-                <MetricCard type="VELOCITY" value={totalOrder} label="Total Orders" isHighlighted={true} />
-                <MetricCard type="ENGAGEMENTS" value={totalBooking} label="Bookings" isHighlighted={false} />
+              <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8 mt-4">
+                <MetricCard 
+                  type="CATALOG" 
+                  value={totalProducts} 
+                  label="Total Products" 
+                  isHighlighted={selectedMetric === 'CATALOG'} 
+                  onClick={() => setSelectedMetric('CATALOG')}
+                />
+                <MetricCard 
+                  type="VELOCITY" 
+                  value={totalOrder} 
+                  label="Total Orders" 
+                  isHighlighted={selectedMetric === 'VELOCITY'} 
+                  onClick={() => setSelectedMetric('VELOCITY')}
+                />
+                <MetricCard 
+                  type="ENGAGEMENTS" 
+                  value={totalBooking} 
+                  label="Bookings" 
+                  isHighlighted={selectedMetric === 'ENGAGEMENTS'} 
+                  onClick={() => setSelectedMetric('ENGAGEMENTS')}
+                />
               </section>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-                <div className="lg:col-span-3">
-                  <RecentActivity activities={activityData} />
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
+                <div className="w-full">
+                  <RecentActivity activities={latestThreeActivities} onViewAllClick={handleViewAllRedirect} />
                 </div>
               </div>
             </div>
@@ -65,63 +121,89 @@ export default function CommandCenterDashboard({
 
       case 'Products':
         return (
-          <InventoryDashboard
-            products={products}
-            isEmbedded={true}
-            onAddProductClick={handleAddProductToggle}
-            onDeleteProduct={onDeleteProduct} 
-            onEditProduct={onEditProduct}
-          />
+          <div className="w-full overflow-x-hidden">
+            <InventoryDashboard
+              products={products}
+              isEmbedded={true}
+              onAddProductClick={handleAddProductToggle}
+              onDeleteProduct={onDeleteProduct} 
+              onEditProduct={onEditProduct}
+            />
+          </div>
         );
 
       case 'Orders':
         return (
-          <OrderQueueDashboard 
-            orders={orders} 
-            onConfirmOrder={onConfirmOrder}
-            onShipOrder={onShipOrder} // FIXED: shipOrderApi hata kar seedhe onShipOrder kar diya hai
-            onCancelOrder={onCancelOrder}
-          />
+          <div className="w-full overflow-x-hidden">
+            <OrderQueueDashboard 
+              orders={orders} 
+              onConfirmOrder={onConfirmOrder}
+              onShipOrder={onShipOrder} 
+              onCancelOrder={onCancelOrder}
+            />
+          </div>
         );
 
       case 'Bookings':
         return (
-          <BookingsDashboard 
-            allBookings={allBookings}
-            onConfirmBooking={onConfirmBooking}
-            onCompleteBooking={onCompleteBooking}
-            onCancelBooking={onCancelBooking}
-          />
+          <div className="w-full overflow-x-hidden">
+            <BookingsDashboard 
+              allBookings={allBookings}
+              onConfirmBooking={onConfirmBooking}
+              onCompleteBooking={onCompleteBooking}
+              onCancelBooking={onCancelBooking}
+            />
+          </div>
         );
 
       case 'Shop Profile':
-        return <ShopProfileDashboard shopData={shop} onDelete={onDeleteShop} onSave={onSave}/>;
+        return (
+          <div className="w-full overflow-x-hidden">
+            <ShopProfileDashboard shopData={shop} onDelete={onDeleteShop} onSave={onSave}/>
+          </div>
+        );
 
       case 'AddProduct':
         return (
-          <AddProductDashboard 
-            onBack={() => setActiveTab('Products')} 
-            onSubmit={(formData) => {
-              onSubmit(formData);
-              setActiveTab('Products');
-            }} 
-          />
+          <div className="w-full overflow-x-hidden">
+            <AddProductDashboard 
+              onBack={() => setActiveTab('Products')} 
+              onSubmit={(formData) => {
+                onSubmit(formData);
+                setActiveTab('Products');
+              }} 
+            />
+          </div>
         );
 
       default:
         return (
-          <div className="flex-1 text-white">
+          <div className="flex-1 text-white w-full">
             <Header title={activeTab.toUpperCase()} subtitle="Section under development" />
-            <div className="mt-6 p-6 bg-[#141414] rounded-xl border border-[#1F1F1F]">Coming Soon...</div>
+            <div className="mt-6 p-4 sm:p-6 bg-[#141414] rounded-xl border border-[#1F1F1F]">Coming Soon...</div>
           </div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0E0E0E] flex">
-      <Sidebar currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} onNavChange={setActiveTab} />
-      <main className="flex-1 p-4 sm:p-6 md:p-8 lg:pl-64 max-w-7xl mx-auto w-full flex flex-col justify-between">
+    <div className="min-h-screen bg-[#0E0E0E] relative flex flex-col w-full overflow-x-hidden">
+      <button 
+        type="button"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="fixed top-4 left-4 z-50 p-2.5 sm:p-3 bg-[#141414] border border-[#1F1F1F] rounded-xl flex items-center justify-center text-[#F7FFB0] hover:text-white transition-colors cursor-pointer"
+      >
+        {isSidebarOpen ? <X className="w-5 h-5 stroke-[2.5]" /> : <Menu className="w-5 h-5 stroke-[2.5]" />}
+      </button>
+
+      <Sidebar 
+        currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} 
+        onNavChange={setActiveTab} 
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
+
+      <main className="flex-1 p-4 sm:p-6 md:p-8 pt-20 max-w-7xl mx-auto w-full flex flex-col justify-between overflow-x-hidden">
         {renderContent()}
       </main>
     </div>

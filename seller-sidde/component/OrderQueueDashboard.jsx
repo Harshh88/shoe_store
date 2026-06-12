@@ -14,13 +14,11 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
 
   const displayOrders = orders || defaultOrders;
 
-  // FILTER LOGIC
   const filteredOrders = displayOrders.filter((order) => {
     if (activeFilter === 'ALL') return true;
     return order?.status?.toLowerCase() === activeFilter.toLowerCase();
   });
 
-  // COUNTS FOR SECTIONS
   const allCount = displayOrders.length;
   const pendingCount = displayOrders.filter(o => o.status?.toLowerCase() === 'pending').length;
   const confirmedCount = displayOrders.filter(o => o.status?.toLowerCase() === 'confirmed').length;
@@ -33,7 +31,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
     { label: `PENDING (${pendingCount})`, value: 'PENDING' },
     { label: `CONFIRMED (${confirmedCount})`, value: 'CONFIRMED' },
     { label: `SHIPPED (${shippedCount})`, value: 'SHIPPED' },
-    { label: `DELIVERED (${deliveredCount})`, value: 'DELIVERED' }, // Added Delivered Tab
+    { label: `DELIVERED (${deliveredCount})`, value: 'DELIVERED' }, 
     { label: `CANCELLED (${cancelledCount})`, value: 'CANCELLED' }
   ];
 
@@ -41,13 +39,12 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
     switch (status?.toUpperCase()) {
       case 'SHIPPED': return 'bg-[#152321] text-[#4FF1C2] border-[#223933]';
       case 'CONFIRMED': return 'bg-[#182538] text-[#529CFF] border-[#203146]';
-      case 'DELIVERED': return 'bg-[#12222a] text-[#2fe4ff] border-[#1b3440]'; // Delivered Style
+      case 'DELIVERED': return 'bg-[#12222a] text-[#2fe4ff] border-[#1b3440]'; 
       case 'CANCELLED': return 'bg-[#2B1818] text-[#FF5252] border-[#462020]';
       default: return 'bg-[#2A2315] text-[#FFB020] border-[#3F331A]';
     }
   };
 
-  // FULL INFORMATION COMPONENT VIEW
   if (selectedOrder) {
     return (
       <div className="flex-1 text-white w-full flex flex-col justify-between animate-in fade-in duration-200">
@@ -77,7 +74,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
               </div>
               <div>
                 <label className="text-[9px] font-mono text-zinc-500 uppercase block mb-1">Financial Valuation</label>
-                <div className="text-xl font-black font-mono text-[#D9FA53]">₹{selectedOrder.total_amount}</div>
+                <div className="text-xl font-black font-mono text-[#F7FFB0]">₹{selectedOrder.total_amount}</div>
               </div>
               <div>
                 <label className="text-[9px] font-mono text-zinc-500 uppercase block mb-1">Current State Status</label>
@@ -122,7 +119,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
                 <>
                   <button 
                     onClick={() => { onConfirmOrder(selectedOrder.id); setSelectedOrder(null); }}
-                    className="flex-1 md:flex-none px-6 bg-[#D9FA53] hover:bg-[#cbe947] text-black text-xs font-black tracking-widest py-3 rounded-xl font-mono uppercase transition-colors"
+                    className="flex-1 md:flex-none px-6 bg-[#F7FFB0] hover:bg-[#F7FFB0] text-black text-xs font-black tracking-widest py-3 rounded-xl font-mono uppercase transition-colors"
                   >
                     CONFIRM ORDER
                   </button>
@@ -177,7 +174,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
               onClick={() => setActiveFilter(f.value)}
               className={`px-5 py-2 rounded-full text-[10px] font-black font-mono tracking-widest whitespace-nowrap transition-all border ${
                 activeFilter === f.value
-                  ? 'bg-[#D9FA53] text-black border-[#D9FA53]'
+                  ? 'bg-[#F7FFB0] text-black border-[#F7FFB0]'
                   : 'bg-[#141414] text-zinc-500 border-[#222222]'
               }`}
             >
@@ -190,7 +187,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
           <div className="bg-[#141414] border border-[#222222] rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-700 transition-all duration-300">
             <span className="text-[10px] font-mono tracking-widest text-zinc-500 font-bold uppercase block mb-4">AWAITING DISPATCH</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black font-mono text-[#D9FA53]">{pendingCount}</span>
+              <span className="text-5xl font-black font-mono text-[#F7FFB0]">{pendingCount}</span>
               <span className="text-xs text-zinc-500 font-medium font-mono uppercase">Orders</span>
             </div>
             <Package className="absolute right-[-10px] bottom-[-20px] w-32 h-32 text-[#1C1C1C] opacity-30 pointer-events-none stroke-1" />
@@ -205,7 +202,7 @@ export default function OrderQueueDashboard({ orders, onConfirmOrder, onShipOrde
             <Truck className="absolute right-[-10px] bottom-[-20px] w-32 h-32 text-[#1C1C1C] opacity-30 pointer-events-none stroke-1" />
           </div>
 
-          <div className="bg-[#141414] border-y border-r border-[#222222] border-l-2 border-l-[#D9FA53] rounded-2xl p-6 relative overflow-hidden group hover:border-y-zinc-700 hover:border-r-zinc-700 transition-all duration-300">
+          <div className="bg-[#141414] border-y border-r border-[#222222] border-l-2 border-l-[#F7FFB0] rounded-2xl p-6 relative overflow-hidden group hover:border-y-zinc-700 hover:border-r-zinc-700 transition-all duration-300">
             <span className="text-[10px] font-mono tracking-widest text-zinc-500 font-bold uppercase block mb-4">TOTAL REVENUE AMOUNT</span>
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-black font-mono text-white">

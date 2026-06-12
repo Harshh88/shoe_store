@@ -32,10 +32,9 @@ export default function AppointmentCard({ booking, onConfirm, onComplete, onCanc
             <h3 className="text-2xl font-black font-mono tracking-wide text-white">{name}</h3>
           </div>
           
-          {/* Dynamic Date Badge */}
           <div className="text-center bg-[#1A1A1A] px-3 py-2 rounded-xl border border-[#222222]">
             <div className="text-2xl font-black font-mono text-white leading-none">{date}</div>
-            <div className="text-[10px] font-mono font-bold text-[#D9FA53] uppercase mt-1">{month}</div>
+            <div className="text-[10px] font-mono font-bold text-[#F7FFB0] uppercase mt-1">{month}</div>
           </div>
         </div>
 
@@ -53,16 +52,14 @@ export default function AppointmentCard({ booking, onConfirm, onComplete, onCanc
         </div>
       </div>
 
-      {/* Card Actions Logic Based on Current Booking Status */}
       <div>
         <div className="text-[9px] font-mono text-zinc-600 mb-2 uppercase tracking-wider">BOOKING ID: #{id}</div>
         <div className="flex gap-3">
-          {/* PENDING: Isme Confirm aur Cancel dono options rahenge */}
           {currentStatus === 'pending' && (
             <>
               <button 
                 onClick={() => onConfirm(id)}
-                className="flex-1 bg-[#D9FA53] hover:bg-[#cbe947] text-black text-xs font-black tracking-widest py-3 rounded-xl font-mono uppercase transition-colors duration-200"
+                className="flex-1 bg-[#F7FFB0] hover:bg-[#F7FFB0] text-black text-xs font-black tracking-widest py-3 rounded-xl font-mono uppercase transition-colors duration-200"
               >
                 CONFIRM
               </button>
@@ -75,7 +72,6 @@ export default function AppointmentCard({ booking, onConfirm, onComplete, onCanc
             </>
           )}
 
-          {/* CONFIRMED: Ab yahan se cancel button hata diya hai, sirf complete ka option hai */}
           {currentStatus === 'confirmed' && (
             <button 
               onClick={() => onComplete(id)}
@@ -85,7 +81,6 @@ export default function AppointmentCard({ booking, onConfirm, onComplete, onCanc
             </button>
           )}
 
-          {/* COMPLETED / CANCELLED: Isme buttons locked rahenge */}
           {(currentStatus === 'completed' || currentStatus === 'cancelled' || currentStatus === 'cancelled booking') && (
             <button 
               disabled

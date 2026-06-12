@@ -60,7 +60,7 @@ export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
             </span>
           </div>
         </div>
-        <div className="text-xl font-mono font-black text-[#D9FA53]">
+        <div className="text-xl font-mono font-black text-[#F7FFB0]">
           {price.toLocaleString('en-IN',{
             style: 'currency',
             currency: 'INR'

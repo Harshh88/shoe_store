@@ -5,7 +5,7 @@ import Header from '@/component/Header';
 import AddProductButton from '@/component/AddProductButton';
 import ProductCard from '@/component/ProductCard';
 import MetricsOverview from '@/component/MetricsOverview';
-import EditProductDashboard from './EditProductDashboard'; // Naya component import kiya
+import EditProductDashboard from './EditProductDashboard';
 
 export default function InventoryDashboard({ 
   products = [], 
@@ -14,7 +14,7 @@ export default function InventoryDashboard({
   onDeleteProduct,
   onEditProduct
 }) {
-  const [currentView, setCurrentView] = useState('LIST'); // 'LIST' ya 'EDIT'
+  const [currentView, setCurrentView] = useState('LIST');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const totalPrice = products.reduce((acc, curr) => {

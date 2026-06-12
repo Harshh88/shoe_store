@@ -2,13 +2,12 @@
 import React from 'react';
 import { ShoppingCart, MapPin, Plus } from 'lucide-react';
 
-export default function RecentActivity({ activities }) {
-  // Map vector contextual icon styles safely
+export default function RecentActivity({ activities, onViewAllClick }) {
   const getIcon = (type) => {
     switch (type) {
-      case 'ORDER': return <ShoppingCart className="w-4 h-4 text-[#D9FA53]" />;
-      case 'BOOKING': return <MapPin className="w-4 h-4 text-[#D9FA53]" />;
-      default: return <Plus className="w-4 h-4 text-[#D9FA53]" />;
+      case 'ORDER': return <ShoppingCart className="w-4 h-4 text-[#F7FFB0]" />;
+      case 'BOOKING': return <MapPin className="w-4 h-4 text-[#F7FFB0]" />;
+      default: return <Plus className="w-4 h-4 text-[#F7FFB0]" />;
     }
   };
 
@@ -16,7 +15,10 @@ export default function RecentActivity({ activities }) {
     <div className="bg-[#141414] border border-[#222222] rounded-2xl p-6 h-full">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-mono font-bold tracking-wider text-sm text-white">RECENT_ACTIVITY</h3>
-        <button className="text-xs text-zinc-400 hover:text-white transition-colors font-bold tracking-wider font-mono">
+        <button 
+          onClick={onViewAllClick}
+          className="text-xs text-zinc-400 hover:text-white cursor-pointer transition-colors font-bold tracking-wider font-mono"
+        >
           VIEW ALL
         </button>
       </div>
@@ -34,7 +36,6 @@ export default function RecentActivity({ activities }) {
               </div>
             </div>
 
-            {/* Dynamic visual format logic for values or labels */}
             {item.value ? (
               <span className="font-mono font-black text-sm text-white">{item.value}</span>
             ) : item.badge ? (

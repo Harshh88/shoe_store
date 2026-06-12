@@ -97,7 +97,7 @@ export default function AddProductDashboard({ onBack, onSubmit }) {
                 ) : (
                   <>
                     <div className="w-12 h-12 rounded-2xl bg-[#090909] border border-[#222222] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                      <Upload className="w-5 h-5 text-[#D9FA53]" />
+                      <Upload className="w-5 h-5 text-[#F7FFB0]" />
                     </div>
                     <span className="font-mono text-xs font-black tracking-wider uppercase text-white block mb-1">DRAG & DROP</span>
                     <span className="text-[11px] text-zinc-500 font-medium">Or click to browse high-res product shot</span>
@@ -182,7 +182,7 @@ export default function AddProductDashboard({ onBack, onSubmit }) {
           <div className="mt-10 pt-4 border-t border-[#141414]">
             <button 
               type="submit"
-              className="w-full bg-[#D9FA53] hover:bg-[#cbe947] text-black font-mono text-sm font-black tracking-widest py-4.5 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-[0.99] shadow-lg shadow-[#D9FA53]/5 uppercase"
+              className="w-full bg-[#F7FFB0] hover:bg-[#F7FFB0] text-black font-mono text-sm font-black tracking-widest py-4.5 rounded-2xl flex items-center justify-center gap-2 transition-transform active:scale-[0.99] shadow-lg shadow-[#F7FFB0]/5 uppercase"
             >
               <span>ADD PRODUCT</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />

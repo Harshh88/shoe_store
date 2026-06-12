@@ -13,7 +13,7 @@ export default function MetricsOverview({ metricsData }) {
             <span className="text-[10px] font-mono tracking-widest text-zinc-500 font-bold uppercase block mb-1">
               {metric.label}
             </span>
-            <div className={`text-3xl font-black font-mono tracking-tight ${metric.isHighlight ? 'text-[#D9FA53]' : 'text-white'}`}>
+            <div className={`text-3xl font-black font-mono tracking-tight ${metric.isHighlight ? 'text-[#F7FFB0]' : 'text-white'}`}>
               {metric.value}
               {metric.unit && (
                 <span className="text-xs text-zinc-500 font-bold tracking-normal uppercase ml-1.5">{metric.unit}</span>

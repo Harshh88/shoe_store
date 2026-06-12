@@ -13,8 +13,11 @@ export default function AuthSignUp() {
     password: "",
     confirm_password: ""
   };
+  
   const [formData, setFormData] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false); // Shop verification check prompt state
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,30 +29,47 @@ export default function AuthSignUp() {
     e.preventDefault();
     setLoading(true);
 
-    if(formData.password !== formData.confirm_password){
-      alert("passworda do not match");
+    if (formData.password !== formData.confirm_password) {
+      alert("Passwords do not match");
       setLoading(false);
-      setFormData(initialState)
+      return;
     }
 
     try {
-      const response = await signup(formData);
-      console.log(response.data.user);
+      const response = await signup({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+      
+      console.log(response?.data?.user);
       setFormData(initialState);
-      router.push("/login");
+      setShowPrompt(true); // Signup complete, show custom popup terminal
     } catch (err) {
-        console.log("Signup error",err);
-    }finally{
-        setLoading(false);
+      console.log("Signup error", err);
+      alert(err.response?.data?.message || "Signup matrix configuration failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePromptChoice = (registerShop) => {
+    setShowPrompt(false);
+    if (registerShop) {
+      router.push("/shops/add");
+    } else {
+      router.push("/login");
     }
   };
 
   return (
     <SignUp 
-    formData={formData}
-    handleChange={handleChange}
-    handleForm={handleForm}
-    loading={loading}
+      formData={formData}
+      handleChange={handleChange}
+      handleForm={handleForm}
+      loading={loading}
+      showPrompt={showPrompt}
+      onPromptChoice={handlePromptChoice}
     />
   );
 }

@@ -13,25 +13,26 @@ const createTable = async () => {
              total_amount NUMERIC(10,2) NOT NULL,
              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
              
-             
              FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE,
              FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
             `,
     );
-    console.log("order model created successfully");
+
     await pool.query(
       `
             ALTER TABLE orders
             ADD COLUMN IF NOT EXISTS razorpay_order_id VARCHAR(100)
             `,
     );
+
     await pool.query(
       `
             ALTER TABLE orders
             ADD COLUMN IF NOT EXISTS shop_id INTEGER
             `,
     );
+
     await pool.query(
       `
     DO $$
@@ -43,9 +44,10 @@ const createTable = async () => {
         ) THEN
             ALTER TABLE orders
             ADD CONSTRAINT fk_shop
-            FOREIGN KEY (shop_id) REFERENCES shops(id);
+            FOREIGN KEY (shop_id) REFERENCES shops(id)
+            ON DELETE CASCADE;
         END IF;
-    END
+      END
     $$;
     `,
     );

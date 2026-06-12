@@ -23,7 +23,6 @@ export default function OrderTable({ orders, onOrderSelect }) {
 
   const displayOrders = orders || [];
   
-  // PAGINATION LOGIC
   const totalItems = displayOrders.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
 
@@ -94,7 +93,7 @@ export default function OrderTable({ orders, onOrderSelect }) {
                                   {pImage ? (
                                     <img src={pImage} alt={pName} className="w-full h-full object-cover" />
                                   ) : (
-                                    <span className="text-xl">👟</span>
+                                    <span className="text-2xl">👟</span>
                                   )}
                                 </div>
                                 <div>
@@ -151,7 +150,7 @@ export default function OrderTable({ orders, onOrderSelect }) {
                 onClick={() => { setCurrentPage(number); window.scrollTo(0,0); }}
                 className={`w-8 h-8 rounded-full font-mono text-xs font-bold flex items-center justify-center transition-all ${
                   currentPage === number
-                    ? 'bg-white text-black shadow-md'
+                    ? 'bg-[#F7FFB0] text-black shadow-md'
                     : 'border border-[#222222] bg-[#141414] text-zinc-400 hover:text-white'
                 }`}
               >

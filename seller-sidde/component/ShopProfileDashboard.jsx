@@ -19,7 +19,6 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
 
   useEffect(() => {
     if (shopData) {
-      // Backend handles joins differently, adjusting safely for string url or object image map
       let rawUrl = null;
       if (shopData.image_url) {
         rawUrl = shopData.image_url;
@@ -136,7 +135,7 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 group-hover:bg-black/40 transition-colors z-10" />
 
             <div className="z-20 bg-black/60 backdrop-blur-md border border-zinc-800 group-hover:border-zinc-500 px-5 py-3 rounded-2xl flex items-center gap-2.5 transition-all">
-              <Upload className="w-4 h-4 text-[#D9FA53]" />
+              <Upload className="w-4 h-4 text-[#F7FFB0]" />
               <span className="font-mono text-xs font-bold tracking-wider uppercase text-zinc-200">
                 {formData.image_url ? "CHANGE BANNER" : "UPLOAD BANNER"}
               </span>
@@ -198,7 +197,7 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
                 </div>
               ) : (
                 <div className="w-full bg-[#141414] border border-[#222222] rounded-2xl px-5 py-4 font-mono text-sm font-bold text-zinc-300 flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-[#D9FA53]" />
+                  <Phone className="w-4 h-4 text-[#F7FFB0]" />
                   {formData.contact_number}
                 </div>
               )}
@@ -206,7 +205,7 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
 
             <div className="bg-[#141414] border border-[#222222] rounded-3xl p-6">
               <div className="flex items-center gap-2 mb-4 border-b border-[#1C1C1C] pb-3">
-                <MapPin className="w-4 h-4 text-[#D9FA53]" />
+                <MapPin className="w-4 h-4 text-[#F7FFB0]" />
                 <span className="text-[10px] font-mono tracking-widest text-zinc-400 font-bold uppercase">ADDRESS</span>
               </div>
               {isEditing ? (
@@ -253,7 +252,7 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
                 </button>
                 <button 
                   type="submit"
-                  className="bg-[#D9FA53] hover:bg-[#cbe947] text-black font-mono text-xs font-black tracking-widest px-8 py-3.5 rounded-xl transition-transform active:scale-[0.98] shadow-lg shadow-[#D9FA53]/5 uppercase"
+                  className="bg-[#F7FFB0] hover:bg-[#F7FFB0] text-black font-mono text-xs font-black tracking-widest px-8 py-3.5 rounded-xl transition-transform active:scale-[0.98] shadow-lg shadow-[#F7FFB0]/5 uppercase"
                 >
                   SAVE CHANGES
                 </button>
@@ -262,7 +261,7 @@ export default function ShopProfileDashboard({ shopData, onSave, onDelete }) {
               <button 
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="w-full md:w-auto bg-[#D9FA53] hover:bg-[#cbe947] text-black font-mono text-xs font-black tracking-widest px-10 py-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-[#D9FA53]/5 uppercase"
+                className="w-full md:w-auto bg-[#F7FFB0] hover:bg-[#F7FFB0] text-black font-mono text-xs font-black tracking-widest px-10 py-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-[#F7FFB0]/5 uppercase"
               >
                 <Edit3 className="w-4 h-4" />
                 EDIT PROFILE
