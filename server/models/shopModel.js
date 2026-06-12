@@ -1,8 +1,14 @@
 const pool = require("../config/db");
 
+<<<<<<< HEAD
 const createTable = async () => {
   try {
     await pool.query(`CREATE EXTENSION IF NOT EXISTS postgis;`);
+=======
+
+const createTable = async () => {
+  try {
+>>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
     
     await pool.query(
       `CREATE TABLE IF NOT EXISTS shops(
@@ -13,6 +19,12 @@ const createTable = async () => {
               contact_number VARCHAR(15) NOT NULL
             )`,
     );
+<<<<<<< HEAD
+=======
+
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS postgis;`);
+    // console.log("shop model created successfully");
+>>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
     
     await pool.query(`
       DO $$

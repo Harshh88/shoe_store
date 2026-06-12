@@ -66,9 +66,65 @@ orderModel().then(() => console.log("Order table synchronized successfully")).ca
 order_item_model().then(() => console.log("OrderItem table synchronized successfully")).catch(err => console.log("OrderItem table err", err)); 
 imageModel().then(() => console.log("Image table synchronized successfully")).catch(err => console.log("Image table err", err));
 
+<<<<<<< HEAD
 // ==========================================
 // ECOSYSTEM GATEWAY ROUTING PIPELINES
 // ==========================================
+=======
+
+userModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+shopModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+productModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+cartModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+cart_itemModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+}); 
+bookingModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+addressModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+orderModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+order_item_model().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+}); 
+imageModel().then(()=>{
+    console.log("table created successfully");
+}).catch((err)=>{
+    console.log("table err",err)
+});
+
+
+>>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
 const authRoutes = require("./routes/authRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const cartRoutes = require("./routes/cartRoutes");
@@ -89,6 +145,12 @@ app.use("/product", productRoutes);
 // LISTENING INTERFACE CONNECTION NODE
 // ==========================================
 const PORT = process.env.PORT || 3000;
+<<<<<<< HEAD
 app.listen(PORT, () => {
     console.log(`Kinetic backend terminal active on port: ${PORT}`);
 });
+=======
+app.listen(PORT,()=>{
+    console.log(`app is listening on ${PORT}`);
+})
+>>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e

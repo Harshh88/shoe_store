@@ -43,7 +43,11 @@ const logIn = async(req,res) => {
     const {email,password} = req.body;
     try{
         const existUser = await pool.query(`
+<<<<<<< HEAD
             SELECT id,email,password,role  FROM users WHERE email=$1
+=======
+            SELECT id,email,password,role FROM users WHERE email=$1
+>>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
             `,[email])
 
         if(existUser.rows.length === 0){
