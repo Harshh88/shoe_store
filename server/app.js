@@ -124,7 +124,6 @@ imageModel().then(()=>{
 });
 
 
->>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
 const authRoutes = require("./routes/authRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const cartRoutes = require("./routes/cartRoutes");
@@ -153,4 +152,3 @@ app.listen(PORT, () => {
 app.listen(PORT,()=>{
     console.log(`app is listening on ${PORT}`);
 })
->>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
