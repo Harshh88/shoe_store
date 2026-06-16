@@ -1,54 +1,47 @@
 const pool = require("../config/db");
-const {fetchAllShops,fetchUserShop,createShop,deleteShop,editShop} = require("../services/shop.service");
+const { fetchAllShops, fetchUserShop, createShop, deleteShop, editShop } = require("../services/shop.service");
 const uploadOnCloudinary = require("../utils/uploadOnCloudinary");
 
-const getAllShops = async (req,res) => {
+const getAllShops = async (req, res) => {
   try {
-    const { latitude, longitude,limit } = req.body || {};
-    // const { limit } = req.query;
-    // const limit = 6;
-    const shops = await fetchAllShops({
-      latitude,
-      longitude,
-      limit
-    });
-    // console.log(shops);
+    const { latitude, longitude, limit } = req.body || {};
+    const shops = await fetchAllShops({ latitude, longitude, limit });
+    
     res.status(200).json({
       success: true,
       message: shops.length ? "shops fetch successfully" : "shops not found",
       shops
     });
-
   } catch (err) {
     console.log("something error in shopController", err);
     return res.status(500).json({
       success: false,
       message: err.message
-    })
+    });
   }
 };
 
-const getShopByUserId = async(req,res) => {
-  try{
+const getShopByUserId = async (req, res) => {
+  try {
     const user_id = req.user.id;
-    const shop = await fetchUserShop({user_id});
-    if(!shop){
+    const shop = await fetchUserShop({ user_id });
+    if (!shop) {
       return res.status(404).json({
         message: "you don't have shop",
         success: false
-      })
+      });
     }
     res.status(200).json({
       shop: shop,
       message: "shop fetch successfully",
       success: true
-    })
-  }catch(err){
+    });
+  } catch (err) {
     return res.status(err.status || 500).json({
       message: err.message
-    })
+    });
   }
-}
+};
 
 const createNewShop = async (req, res) => {
   try {
@@ -95,7 +88,6 @@ const createNewShop = async (req, res) => {
       token,
       message: "shop created successfully"
     });
-
   } catch (err) {
     console.log(err);
     return res.status(err.status || 500).json({
@@ -105,30 +97,30 @@ const createNewShop = async (req, res) => {
   }
 };
 
-const deleteShopBySeller = async(req,res) => {
-  try{
+const deleteShopBySeller = async (req, res) => {
+  try {
     const user_id = req.user.id;
     const deletedShop = await deleteShop(user_id);
     
-    if(!deleteShop){
+    if (!deletedShop) {
       return res.status(404).json({
         success: false,
         message: "you don't have any shop to delete "
-      })
+      });
     }
-    console.log(deleteShop);
+    
     res.status(200).json({
       success: true,
-      deleteShop
-    })
-  }catch(err){
+      deleteShop: deletedShop
+    });
+  } catch (err) {
     console.log(err);
     return res.status(err.status || 500).json({
       message: err.message,
       success: false
-    })
+    });
   }
-}
+};
 
 const editShopController = async (req, res) => {
   try {
@@ -145,23 +137,27 @@ const editShopController = async (req, res) => {
 
     const { name, description, contact_number, address } = req.body;
 
-    let image = null;
+    let updateData = {};
+    if (name) updateData.name = name;
+    if (description) updateData.description = description;
+    if (contact_number) updateData.contact_number = contact_number;
+    if (address) updateData.address = address;
 
     if (req.file) {
       const cloudinaryRes = await uploadOnCloudinary(req.file.path, "shops");
-      image = cloudinaryRes?.secure_url || cloudinaryRes?.url || cloudinaryRes;
-      
+      updateData.image_url = cloudinaryRes?.secure_url || cloudinaryRes?.url || cloudinaryRes;
     }
 
-    await editShop({
+    const updatedShop = await editShop({
       shop_id,
-      data: [name, description, contact_number, address, image],
+      data: updateData
     });
-    if(!editShop){
+
+    if (!updatedShop) {
       return res.status(500).json({
         success: false,
         message: "failed to shop edit"
-      })
+      });
     }
 
     const freshShopData = await fetchUserShop({ user_id });
@@ -169,15 +165,15 @@ const editShopController = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Shop updated successfully",
-      shop: freshShopData,
+      shop: freshShopData
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal Server Error"
     });
   }
 };
 
-module.exports = {getAllShops,getShopByUserId,createNewShop,deleteShopBySeller,editShopController};
+module.exports = { getAllShops, getShopByUserId, createNewShop, deleteShopBySeller, editShopController };
