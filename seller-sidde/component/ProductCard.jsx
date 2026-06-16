@@ -46,7 +46,7 @@ export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
         <div className="absolute inset-0 flex items-center justify-center p-4 overflow-hidden filter drop-shadow-2xl transition-transform duration-500 group-hover:scale-105">
           <img
             className="w-full h-full object-contain"
-            src={finalImageUrl} 
+            src={image_url} 
             alt={name} 
           />
         </div>
