@@ -1,3 +1,4 @@
+"use client";
 import { useShop } from "@/context/ShopContext";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
@@ -28,7 +29,8 @@ export const NearbyShops = () => {
               <img 
                 src={shop.image} 
                 alt={shop.name} 
-                className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition duration-500" 
+                /* 🔥 FIX: Mobile par grayscale-0 (colorful) rahega, medium (md) aur badhe screens par grayscale ho kar hover par colorfull hoga */
+                className="object-cover w-full h-full grayscale-0 md:grayscale md:group-hover:grayscale-0 transition duration-500" 
               />
               <h3 className="uppercase text-xl font-bold text-white absolute bottom-[3rem] left-[2rem]">
                 {shop.name}
