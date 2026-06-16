@@ -2,52 +2,62 @@ const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const signUp = async(req,res) => {
-    const {name,email,password} = req.body;
-    // const role = "SELLER";
-    try{
-        if(!name || !email || !password){
+const signUp = async (req, res) => {
+    const { name, email, password } = req.body;
+    try {
+        if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "all field required"
-            })
+            });
         }
-        const existUser = await pool.query(`SELECT 1 FROM users WHERE email=$1`,
-            [email]
-        )
-        if(existUser.rows.length !== 0){
+        
+        const existUser = await pool.query(`SELECT 1 FROM users WHERE email=$1`, [email]);
+        if (existUser.rows.length !== 0) {
             return res.status(409).json({
                 success: false,
-                message: "User already exist"});
+                message: "User already exist"
+            });
         }
-        const hashPassword = await bcrypt.hash(password,10);
-        const createdUser =  await pool.query(`INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING id,name,email,role`,
-            [name,email,hashPassword]
-        )
+        
+        const hashPassword = await bcrypt.hash(password, 10);
+        
+        const createdUser = await pool.query(
+            `INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING id,name,email,role`,
+            [name, email, hashPassword]
+        );
+
+        const user = createdUser.rows[0];
+
+        const payload = {
+            id: user.id,
+            email: user.email,
+            role: user.role
+        };
+
+        const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "1d" });
+
         res.status(201).json({
             success: true,
             message: "signup successfull",
-            user: createdUser.rows[0]
-        })
+            user,
+            token
+        });
     }
-    catch(err){
-        console.log("err in signup controller",err);
+    catch (err) {
+        console.log("err in signup controller", err);
         res.status(500).json({
             success: false,
             message: err.message
-        })
+        });
     }
-}
+};
 
 const logIn = async(req,res) => {
     const {email,password} = req.body;
     try{
         const existUser = await pool.query(`
-<<<<<<< HEAD
-            SELECT id,email,password,role  FROM users WHERE email=$1
-=======
             SELECT id,email,password,role FROM users WHERE email=$1
->>>>>>> 742b9c30d3a9a3672e0e825abce5adfdbcfd434e
             `,[email])
 
         if(existUser.rows.length === 0){
@@ -95,3 +105,4 @@ const logIn = async(req,res) => {
 
 
 module.exports = {signUp,logIn};
+
