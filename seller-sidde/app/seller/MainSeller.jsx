@@ -135,24 +135,14 @@ export default function CommandCenterDashboard({
       case 'Orders':
         return (
           <div className="w-full overflow-x-hidden">
-            <OrderQueueDashboard 
-              orders={orders} 
-              onConfirmOrder={onConfirmOrder}
-              onShipOrder={onShipOrder} 
-              onCancelOrder={onCancelOrder}
-            />
+            <OrderQueueDashboard orders={orders} onConfirmOrder={onConfirmOrder} onShipOrder={onShipOrder} onCancelOrder={onCancelOrder} />
           </div>
         );
 
       case 'Bookings':
         return (
           <div className="w-full overflow-x-hidden">
-            <BookingsDashboard 
-              allBookings={allBookings}
-              onConfirmBooking={onConfirmBooking}
-              onCompleteBooking={onCompleteBooking}
-              onCancelBooking={onCancelBooking}
-            />
+            <BookingsDashboard allBookings={allBookings} onConfirmBooking={onConfirmBooking} onCompleteBooking={onCompleteBooking} onCancelBooking={onCancelBooking} />
           </div>
         );
 
@@ -172,7 +162,6 @@ export default function CommandCenterDashboard({
                 const success = await onSubmit(formData);
                 if (success) {
                   alert("Product added successfully!");
-                  // Proper state refresh hone par hi component switch karega
                   setActiveTab('Products');
                 } else {
                   alert("Failed to add product.");
@@ -202,12 +191,7 @@ export default function CommandCenterDashboard({
         {isSidebarOpen ? <X className="w-5 h-5 stroke-[2.5]" /> : <Menu className="w-5 h-5 stroke-[2.5]" />}
       </button>
 
-      <Sidebar 
-        currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} 
-        onNavChange={setActiveTab} 
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-      />
+      <Sidebar currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} onNavChange={setActiveTab} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <main className="flex-1 p-4 sm:p-6 md:p-8 pt-20 max-w-7xl mx-auto w-full flex flex-col justify-between overflow-x-hidden">
         {renderContent()}
