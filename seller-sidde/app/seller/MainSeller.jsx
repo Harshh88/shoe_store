@@ -168,9 +168,14 @@ export default function CommandCenterDashboard({
           <div className="w-full overflow-x-hidden">
             <AddProductDashboard 
               onBack={() => setActiveTab('Products')} 
-              onSubmit={(formData) => {
-                onSubmit(formData);
-                setActiveTab('Products');
+              onSubmit={async (formData) => {
+                const success = await onSubmit(formData);
+                if (success) {
+                  alert("Product added successfully!");
+                  setActiveTab('Products');
+                } else {
+                  alert("Failed to add product.");
+                }
               }} 
             />
           </div>
