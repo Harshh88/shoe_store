@@ -17,9 +17,18 @@ export default function PaymentPage() {
 
   useEffect(() => {
     setOrderAmount(Number(searchParams.get("amount") || 1));
+    
+    // Immediate Browser Alert on component mount/open
+    alert("ATTENTION: This payment system and QR codes are strictly DUMMY for testing purposes. To complete your order successfully, please select the 'Cash on Delivery' option and proceed.");
   }, [searchParams]);
 
   const processPayment = async () => {
+    if (paymentMethod === "upi") {
+      alert("This UPI route/QR code is a dummy placeholder. Please select Cash on Delivery to complete your order successfully.");
+      setPaymentMethod("cod");
+      return;
+    }
+
     if (paymentMethod === "cod") {
       alert("Order placed with Cash on Delivery state successfully.");
       router.push(`/order/success/${params.id}`);
@@ -108,7 +117,7 @@ export default function PaymentPage() {
       rzp.open();
     } catch (err) {
       console.log("Error reaching backend payment engine:", err);
-      alert(err.response?.data?.message || "Internal gateway console error.");
+      alert(err.response?.data?.message || "Internal gateway gateway error.");
     } finally {
       setLoading(false);
     }
