@@ -17,8 +17,14 @@ export default function InventoryDashboard({
   const [currentView, setCurrentView] = useState('LIST');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // Total value metrics
   const totalPrice = products.reduce((acc, curr) => {
     return acc + Number(curr.price || 0);
+  }, 0);
+
+  // Total absolute quantities across all dynamic item listings
+  const totalStockCount = products.reduce((acc, curr) => {
+    return acc + Number(curr.stock || 0);
   }, 0);
 
   const IndianPrice = totalPrice.toLocaleString('en-IN', {
@@ -28,7 +34,7 @@ export default function InventoryDashboard({
   
   const sampleMetrics = [
     { label: 'INVENTORY VALUE', value: IndianPrice },
-    { label: 'TOTAL STOCK', value: products.length },
+    { label: 'TOTAL STOCK', value: totalStockCount },
   ];
 
   const handleEditClick = (product) => {
