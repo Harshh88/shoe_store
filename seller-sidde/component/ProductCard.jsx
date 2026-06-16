@@ -8,7 +8,7 @@ export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
   const targetId = id || _id;
 
   // Fallback string for handling new backend insertions seamlessly without reload
-  const finalImageUrl = image_url || url || "/fallback-placeholder.png";
+  const finalImageUrl = image_url;
 
   const handleDeleteClick = () => {
     if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
