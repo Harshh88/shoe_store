@@ -144,6 +144,7 @@ export default function Seller() {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
       setProducts(response.data.product || []);
+      console.log(response.data.product);
     } catch (err) {
       console.error(err);
     }
