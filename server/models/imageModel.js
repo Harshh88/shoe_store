@@ -2,6 +2,7 @@ const pool = require("../config/db");
 
 const createTable = async () => {
   try {
+    // 1. Table agar nahi hai toh banegi
     await pool.query(
       `CREATE TABLE IF NOT EXISTS images (
         id SERIAL PRIMARY KEY,
@@ -14,6 +15,13 @@ const createTable = async () => {
       );`
     );
 
+    // 🔥 CRITICAL FIX FOR PRODUCTION:
+    // Agar production par images table pehle se bani hai par user_id nahi hai, toh ye column add kar dega
+    await pool.query(`
+      ALTER TABLE images ADD COLUMN IF NOT EXISTS user_id INTEGER;
+    `);
+
+    // 2. Purani reference constraint drop karna
     await pool.query(`
       DO $$
       BEGIN
@@ -27,6 +35,7 @@ const createTable = async () => {
       $$;
     `);
 
+    // 3. New Check Constraint (Shop OR Product OR User)
     await pool.query(`
       DO $$
       BEGIN
@@ -46,6 +55,7 @@ const createTable = async () => {
       $$;
     `);
 
+    // 4. FK for Shop
     await pool.query(`
       DO $$
       BEGIN
@@ -60,6 +70,7 @@ const createTable = async () => {
       $$;
     `);
 
+    // 5. FK for Product
     await pool.query(`
       DO $$
       BEGIN
@@ -74,6 +85,7 @@ const createTable = async () => {
       $$;
     `);
 
+    // 6. FK for User
     await pool.query(`
       DO $$
       BEGIN
@@ -88,6 +100,7 @@ const createTable = async () => {
       $$;
     `);
 
+    // 7. Unique Indexes for Is Primary
     await pool.query(`
       CREATE UNIQUE INDEX IF NOT EXISTS unique_primary_product
       ON images (product_id)
