@@ -47,4 +47,4 @@ const createTable = async () => {
 };
 
 
-module.exports = { createTable };
+module.exports =  createTable ;
