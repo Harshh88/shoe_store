@@ -3,8 +3,12 @@ import React from 'react';
 import { ShoppingBag, Pencil, Trash2 } from 'lucide-react';
 
 export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
-  const { name, price, stock, url, id, _id } = product;
+  // Destructuring both variants of property mappings safely
+  const { name, price, stock, url, image_url, id, _id } = product;
   const targetId = id || _id;
+
+  // Fallback string for handling new backend insertions seamlessly without reload
+  const finalImageUrl = image_url || url || "/fallback-placeholder.png";
 
   const handleDeleteClick = () => {
     if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
@@ -42,7 +46,7 @@ export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
         <div className="absolute inset-0 flex items-center justify-center p-4 overflow-hidden filter drop-shadow-2xl transition-transform duration-500 group-hover:scale-105">
           <img
             className="w-full h-full object-contain"
-            src={url} 
+            src={finalImageUrl} 
             alt={name} 
           />
         </div>
@@ -56,12 +60,12 @@ export default function ProductCard({ product, onDeleteProduct, onEditClick }) {
           </h3>
           <div className="flex items-center gap-4 text-zinc-500 font-mono text-[11px] mt-1.5">
             <span className="flex items-center gap-1">
-              <ShoppingBag className="w-3 h-3 text-zinc-600" /> STOCK: <span className="text-zinc-300 font-bold">{stock}</span>
+              <ShoppingBag className="w-3 h-3 text-zinc-600" /> STOCK: <span className="text-zinc-300 font-bold">{stock || 0}</span>
             </span>
           </div>
         </div>
         <div className="text-xl font-mono font-black text-[#F7FFB0]">
-          {price.toLocaleString('en-IN',{
+          {(price || 0).toLocaleString('en-IN',{
             style: 'currency',
             currency: 'INR'
           })}
