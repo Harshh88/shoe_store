@@ -172,6 +172,7 @@ export default function CommandCenterDashboard({
                 const success = await onSubmit(formData);
                 if (success) {
                   alert("Product added successfully!");
+                  // Proper state refresh hone par hi component switch karega
                   setActiveTab('Products');
                 } else {
                   alert("Failed to add product.");
