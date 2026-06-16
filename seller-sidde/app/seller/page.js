@@ -2,7 +2,6 @@
 import MainSeller from "./MainSeller";
 import { useBooking } from "@/context/BookingContext";
 import { useProducts } from "@/context/ProductContext";
-import { useToken } from "@/context/TokenContext";
 import { useOrder } from "@/context/OrderContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,9 +20,7 @@ export default function Seller() {
       const response = await api.post(
         "/booking/seller/get-bookings",
         {},
-        {
-          headers: { Authorization: `Bearer ${sellerToken}` },
-        },
+        { headers: { Authorization: `Bearer ${sellerToken}` } }
       );
       if (response.data.getAllBookings === undefined) return;
       setAllBookings(response.data.getAllBookings);
@@ -35,96 +32,78 @@ export default function Seller() {
   const confirmBookingApi = async (bookingId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/booking/seller/confirm-bookings/${bookingId}`, {}, {
+      await api.put(`/booking/seller/confirm-bookings/${bookingId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Booking confirmed successfully!");
-        fetchBookings(sellerToken); 
-      }
+      alert("Booking confirmed successfully!");
+      fetchBookings(sellerToken); 
     } catch (err) {
-      console.error("Error confirming booking:", err);
-      alert(err.response?.data?.message || "Failed to confirm booking");
+      console.error(err);
     }
   };
 
   const completeBookingApi = async (bookingId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/booking/seller/complete-bookings/${bookingId}`, {}, {
+      await api.put(`/booking/seller/complete-bookings/${bookingId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Booking marked as completed!");
-        fetchBookings(sellerToken);
-      }
+      alert("Booking marked as completed!");
+      fetchBookings(sellerToken);
     } catch (err) {
-      console.error("Error completing booking:", err);
-      alert(err.response?.data?.message || "Failed to complete booking");
+      console.error(err);
     }
   };
 
   const cancelBookingApi = async (bookingId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/booking/cancel-bookings/${bookingId}`, {}, {
+      await api.put(`/booking/cancel-bookings/${bookingId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Booking cancelled successfully!");
-        fetchBookings(sellerToken);
-      }
+      alert("Booking cancelled successfully!");
+      fetchBookings(sellerToken);
     } catch (err) {
-      console.error("Error cancelling booking:", err);
-      alert(err.response?.data?.message || "Failed to cancel booking");
+      console.error(err);
     }
   };
 
   const confirmOrderApi = async (orderId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/order/confirm-order/${orderId}`, {}, {
+      await api.put(`/order/confirm-order/${orderId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Order confirmed successfully!");
-        fetchAllOrders(sellerToken); 
-      }
+      alert("Order confirmed successfully!");
+      fetchAllOrders(sellerToken); 
     } catch (err) {
-      console.error("Error confirming order:", err);
-      alert(err.response?.data?.message || "Failed to confirm order");
+      console.error(err);
     }
   };
 
   const shipOrderApi = async (orderId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/order/ship-order/${orderId}`, {}, {
+      await api.put(`/order/ship-order/${orderId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Order shipped successfully!");
-        fetchAllOrders(sellerToken);
-      }
+      alert("Order shipped successfully!");
+      fetchAllOrders(sellerToken);
     } catch (err) {
-      console.error("Error shipping order:", err);
-      alert(err.response?.data?.message || "Failed to ship order");
+      console.error(err);
     }
   };
 
   const cancelOrderApi = async (orderId) => {
     try {
       const sellerToken = localStorage.getItem("sellerToken");
-      const response = await api.put(`/order/cancel-order/${orderId}`, {}, {
+      await api.put(`/order/cancel-order/${orderId}`, {}, {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
-      if (response.status === 200 || response.data?.success) {
-        alert("Order cancelled successfully!");
-        fetchAllOrders(sellerToken);
-      }
+      alert("Order cancelled successfully!");
+      fetchAllOrders(sellerToken);
     } catch (err) {
-      console.error("Error cancelling order:", err);
-      alert(err.response?.data?.message || "Failed to cancel order");
+      console.error(err);
     }
   };
 
@@ -144,7 +123,6 @@ export default function Seller() {
         headers: { Authorization: `Bearer ${sellerToken}` }
       });
       setProducts(response.data.product || []);
-      console.log(response.data.product);
     } catch (err) {
       console.error(err);
     }
@@ -211,7 +189,6 @@ export default function Seller() {
       });
       if (res.data && res.data.success) {
         if (sellerToken) {
-          // Tight fresh sync trigger karne ke liye await
           await fetchAllProducts(sellerToken);
         }
         return true;
@@ -238,8 +215,7 @@ export default function Seller() {
         return res.data;
       }
     } catch (err) {
-      console.error("Error editing product:", err);
-      alert(err.response?.data?.message || "Something went wrong while updating");
+      console.error(err);
     }
   };
 
@@ -256,7 +232,7 @@ export default function Seller() {
         alert("Product deleted successfully!");
       }
     } catch (err) {
-      console.error("Error deleting product:", err);
+      console.error(err);
     }
   };
 
@@ -279,22 +255,12 @@ export default function Seller() {
   };
 
   useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.origin !== 'http://localhost:3001') return;
-      if (event.data && event.data.type === 'SET_SELLER_TOKEN') {
-        const token = event.data.token;
-        localStorage.setItem('sellerToken', token);
-        loadSellerData(token);
-      }
-    };
-    window.addEventListener('message', handleMessage);
     const existToken = localStorage.getItem("sellerToken");
     if (!existToken) {
       router.push("/seller/login");
     } else {
       loadSellerData(existToken);
     }
-    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   return (
