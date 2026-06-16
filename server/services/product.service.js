@@ -19,6 +19,7 @@ const fetchAllProducts = async ({ shop_id, limit }) => {
 
 const addProduct = async ({ user_id, shop_id, data }) => {
   try {
+    // 1. Pehle product insert karo (image_id abhi null rahega)
     const newProduct = await pool.query(
       `
       INSERT INTO products(user_id, shop_id, name, description, price, stock, size)
@@ -28,20 +29,38 @@ const addProduct = async ({ user_id, shop_id, data }) => {
       [user_id, shop_id, data.name, data.description, data.price, data.stock, data.size]
     );
 
-    const product = newProduct.rows[0];
+    let product = newProduct.rows[0];
 
-    // Agar image aayi hai toh use save karo aur return object me bind karo
+    // 2. Agar productImage aayi hai toh images table me daalo
     if (data.productImage) {
-      await pool.query(
+      const newImage = await pool.query(
         `
         INSERT INTO images(url, product_id, is_primary)
         VALUES($1, $2, TRUE)
+        RETURNING id, url
         `,
         [data.productImage, product.id]
       );
+
+      const imageId = newImage.rows[0].id;
+      const imageUrl = newImage.rows[0].url;
+
+      // 3. 🔥 MAIN FIX: Wapas product table me jao aur image_id link karo
+      const updatedProduct = await pool.query(
+        `
+        UPDATE products 
+        SET image_id = $1 
+        WHERE id = $2 
+        RETURNING *
+        `,
+        [imageId, product.id]
+      );
+
+      product = updatedProduct.rows[0];
       
-      // Object me image path append kar diya
-      product.image_url = data.productImage;
+      // Frontend ki safety ke liye dono fields append kar do taaki image kabhie na fte
+      product.url = imageUrl;
+      product.image_url = imageUrl;
     }
 
     return product;
