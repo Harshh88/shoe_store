@@ -2,7 +2,12 @@
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ShippingForm from "@/component/ShippingForm"; // Import matching design
+import ShippingForm from "@/component/ShippingForm"; 
+
+// Direct Execution Rule (Runs immediately when file loads)
+if (typeof window !== "undefined") {
+  alert("Notice: I will integrate a live map here in a few days so you can track your product live.");
+}
 
 export default function OrderCheckoutPage() {
   const router = useRouter();
@@ -36,7 +41,9 @@ export default function OrderCheckoutPage() {
     }
   };
 
-  useEffect(() => { cartTotal(); }, []);
+  useEffect(() => { 
+    cartTotal(); 
+  }, []);
 
   const submitForm = async (e) => {
     e.preventDefault();
