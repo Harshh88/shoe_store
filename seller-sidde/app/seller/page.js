@@ -209,10 +209,15 @@ export default function Seller() {
         }
       });
       if (res.data && res.data.success) {
-        if (sellerToken) fetchAllProducts(sellerToken);
+        if (sellerToken) {
+          await fetchAllProducts(sellerToken);
+        }
+        return true;
       }
+      return false;
     } catch (err) {
       console.log(err);
+      return false;
     }
   };
 
@@ -268,6 +273,53 @@ export default function Seller() {
     } catch (err) {
       console.error(err);
       router.push("/seller/login");
+    }
+  };
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.origin !== 'http://localhost:3001') return;
+      if (event.data && event.data.type === 'SET_SELLER_TOKEN') {
+        const token = event.data.token;
+        localStorage.setItem('sellerToken', token);
+        loadSellerData(token);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    const existToken = localStorage.getItem("sellerToken");
+    if (!existToken) {
+      router.push("/seller/login");
+    } else {
+      loadSellerData(existToken);
+    }
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  return (
+    <div>
+      <MainSeller
+        totalBooking={allBookings ? allBookings.length : 0}
+        totalProducts={products ? products.length : 0}
+        totalOrder={order ? order.length : 0}
+        products={products || []}
+        orders={order || []}
+        allBookings={allBookings || []}
+        shop={shop}
+        onDeleteShop={() => deleteShop(localStorage.getItem("sellerToken"))}
+        onSave={handleShopSave}
+        onSubmit={addProduct}
+        onDeleteProduct={deleteProductApi} 
+        onEditProduct={editProduct} 
+        onConfirmBooking={confirmBookingApi}
+        onCompleteBooking={completeBookingApi}
+        onCancelBooking={cancelBookingApi}
+        onConfirmOrder={confirmOrderApi}
+        onShipOrder={shipOrderApi}
+        onCancelOrder={cancelOrderApi}
+      />
+    </div>
+  );
+}      router.push("/seller/login");
     }
   };
 
