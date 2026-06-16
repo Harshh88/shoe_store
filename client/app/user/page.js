@@ -6,6 +6,13 @@ import api from "@/lib/api";
 export default function Page() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const defaultAvatar = () => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
+    const defaultImg = "imagen_kq7cqt.png";
+    return `https://res.cloudinary.com/${cloudName}/image/upload/d_${defaultImg}/no_image.png`;
+  };
   
   const [formData, setFormData] = useState({
     name: "",
@@ -14,7 +21,7 @@ export default function Page() {
     created_at: "",
     phone: "", 
     password: "", 
-    url:""
+    url: defaultAvatar()
   });
 
   useEffect(() => {
@@ -27,12 +34,8 @@ export default function Page() {
         }
 
         const res = await api.post("/user/get-profile", {}, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-        const defaultImg = "imagen_kq7cqt.png";
 
         const data = res.data;
         if (data && data.success) {
@@ -43,7 +46,7 @@ export default function Page() {
             created_at: data.user.created_at || "",
             phone: data.user.phone || "",
             password: "",
-            url: data.user.url || `https://res.cloudinary.com/${cloudName}/image/upload/d_${defaultImg}/no_image.png`
+            url: data.user.url || defaultAvatar()
           });
         }
       } catch (error) {
@@ -60,16 +63,50 @@ export default function Page() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setFormData({ ...formData, url: URL.createObjectURL(file) });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await api.post("/user/update-profile", formData, {
+      const dataToSend = new FormData();
+      
+      if (formData.name) dataToSend.append("name", formData.name);
+      if (formData.email) dataToSend.append("email", formData.email);
+      if (formData.phone) dataToSend.append("phone", formData.phone);
+      if (formData.password && formData.password.trim() !== "") {
+        dataToSend.append("password", formData.password);
+      }
+      if (selectedFile) {
+        dataToSend.append("image", selectedFile);
+      }
+
+      const res = await api.put("/user/update-profile", dataToSend, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
         }
       });
-      setIsEditing(false);
+
+      if (res.data && res.data.success) {
+        setFormData({
+          name: res.data.user.name || "",
+          email: res.data.user.email || "",
+          role: res.data.user.role || "",
+          created_at: res.data.user.created_at || "",
+          phone: res.data.user.phone || "",
+          password: "",
+          url: res.data.user.url || defaultAvatar()
+        });
+        setSelectedFile(null);
+        setIsEditing(false);
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -91,6 +128,7 @@ export default function Page() {
         setIsEditing={setIsEditing}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
+        handleFileChange={handleFileChange}
       />
     </div>
   );
