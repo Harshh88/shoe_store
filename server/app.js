@@ -16,7 +16,11 @@ const allowedOrigins = [
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        
+        const isAllowed = allowedOrigins.indexOf(origin) !== -1;
+        const isVercelPreview = origin.endsWith(".vercel.app") || origin.includes("vercel.app");
+
+        if (isAllowed || isVercelPreview) {
             callback(null, true);
         } else {
             callback(new Error("CORS Policy Violation: Source Node Blocked"));
@@ -24,7 +28,7 @@ app.use(cors({
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
 
 app.use(express.json());
@@ -94,7 +98,7 @@ app.use("/booking", bookingRoutes);
 app.use("/order", orderRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/product", productRoutes);
-app.use("/user",userRoutes);
+app.use("/user", userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
