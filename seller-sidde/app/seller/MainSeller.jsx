@@ -121,7 +121,7 @@ export default function CommandCenterDashboard({
 
       case 'Products':
         return (
-          <div className="w-full overflow-x-hidden">
+          <div className="w-full">
             <InventoryDashboard
               products={products}
               isEmbedded={true}
@@ -134,28 +134,39 @@ export default function CommandCenterDashboard({
 
       case 'Orders':
         return (
-          <div className="w-full overflow-x-hidden">
-            <OrderQueueDashboard orders={orders} onConfirmOrder={onConfirmOrder} onShipOrder={onShipOrder} onCancelOrder={onCancelOrder} />
+          <div className="w-full">
+            {/* Added standard wrapper in case you implement network/order displays */}
+            <OrderQueueDashboard 
+              orders={orders} 
+              onConfirmOrder={onConfirmOrder}
+              onShipOrder={onShipOrder} 
+              onCancelOrder={onCancelOrder}
+            />
           </div>
         );
 
       case 'Bookings':
         return (
-          <div className="w-full overflow-x-hidden">
-            <BookingsDashboard allBookings={allBookings} onConfirmBooking={onConfirmBooking} onCompleteBooking={onCompleteBooking} onCancelBooking={onCancelBooking} />
+          <div className="w-full">
+            <BookingsDashboard 
+              allBookings={allBookings}
+              onConfirmBooking={onConfirmBooking}
+              onCompleteBooking={onCompleteBooking}
+              onCancelBooking={onCancelBooking}
+            />
           </div>
         );
 
       case 'Shop Profile':
         return (
-          <div className="w-full overflow-x-hidden">
+          <div className="w-full">
             <ShopProfileDashboard shopData={shop} onDelete={onDeleteShop} onSave={onSave}/>
           </div>
         );
 
       case 'AddProduct':
         return (
-          <div className="w-full overflow-x-hidden">
+          <div className="w-full">
             <AddProductDashboard 
               onBack={() => setActiveTab('Products')} 
               onSubmit={async (formData) => {
@@ -183,19 +194,31 @@ export default function CommandCenterDashboard({
 
   return (
     <div className="min-h-screen bg-[#0E0E0E] relative flex flex-col w-full overflow-x-hidden">
+      {/* Sidebar Toggle Button */}
       <button 
         type="button"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-4 left-4 z-50 p-2.5 sm:p-3 bg-[#141414] border border-[#1F1F1F] rounded-xl flex items-center justify-center text-[#F7FFB0] hover:text-white transition-colors cursor-pointer"
+        className="fixed top-4 left-4 z-50 p-2.5 sm:p-3 bg-[#141414] border border-[#1F1F1F] rounded-xl flex items-center justify-center text-[#F7FFB0] hover:text-white transition-colors cursor-pointer shadow-lg"
       >
         {isSidebarOpen ? <X className="w-5 h-5 stroke-[2.5]" /> : <Menu className="w-5 h-5 stroke-[2.5]" />}
       </button>
 
-      <Sidebar currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} onNavChange={setActiveTab} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      {/* Shared Sidebar */}
+      <Sidebar 
+        currentNav={activeTab === 'AddProduct' ? 'Products' : activeTab} 
+        onNavChange={setActiveTab} 
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
 
-      <main className="flex-1 p-4 sm:p-6 md:p-8 pt-20 max-w-7xl mx-auto w-full flex flex-col justify-between overflow-x-hidden">
-        {renderContent()}
-      </main>
+      {/* Main Content Area: Centered layout with clean grid fluid adjustment */}
+      <div className={`flex-1 w-full flex flex-col items-center transition-all duration-300 ${
+        isSidebarOpen ? 'lg:pl-64' : 'lg:pl-0'
+      }`}>
+        <main className="w-full max-w-7xl p-4 sm:p-6 md:p-8 pt-20 flex flex-col justify-between">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   );
 }
