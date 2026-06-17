@@ -75,17 +75,19 @@ export default function Sidebar({ currentNav = "Dashboard", onNavChange = () => 
       )}
 
       {/* Sidebar Container */}
-      <aside className={`fixed top-0 left-0 h-screen w-64 bg-[#141414] border-r border-[#1F1F1F] p-6 flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+      {/* Yahan fixed layout aur width handling ko adjust kiya hai taaki component idhar udhar na bhage */}
+      <aside className={`fixed top-0 left-0 h-screen bg-[#141414] border-r border-[#1F1F1F] flex flex-col justify-between z-40 transition-all duration-300 ease-in-out ${
+        isOpen ? 'w-64 p-6 translate-x-0' : 'w-0 p-0 -translate-x-full border-none'
       }`}>
         
-        <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar">
+        {/* Wrap content inside an opacity div so it doesn't jank while closing */}
+        <div className={`flex flex-col flex-1 overflow-y-auto no-scrollbar transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8 pt-16">
             <span className="font-mono tracking-wider font-bold text-lg text-white">KINETIC_LABS</span>
           </div>
 
-          {/* Profile Card for Mobile View (Direct Tap Redirection) */}
+          {/* Profile Card for Mobile View */}
           <div className="block lg:hidden mb-6 border-b border-zinc-900 pb-4">
             <Link href="/user" onClick={() => setIsOpen(false)} className="flex items-center gap-3 bg-[#1A1A1A] p-3 rounded-xl border border-[#242424] active:scale-98 transition-transform">
               {userImg ? (
@@ -123,9 +125,9 @@ export default function Sidebar({ currentNav = "Dashboard", onNavChange = () => 
           </nav>
         </div>
 
-        {/* Laptop/Desktop View Profile Wrapper with Hover Handling */}
+        {/* Laptop/Desktop View Profile Wrapper */}
         <div 
-          className="hidden lg:block relative pt-4 border-t border-zinc-900 pb-2"
+          className={`hidden lg:block relative pt-4 border-t border-zinc-900 pb-2 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
           onMouseEnter={() => setIsDropdownOpen(true)}
           onMouseLeave={() => setIsDropdownOpen(false)}
         >
@@ -177,8 +179,8 @@ export default function Sidebar({ currentNav = "Dashboard", onNavChange = () => 
           </button>
         </div>
 
-        {/* Mobile View Logout Option (Drawer Bottom) */}
-        <div className="block lg:hidden pt-4 border-t border-zinc-900 mt-auto">
+        {/* Mobile View Logout Option */}
+        <div className={`block lg:hidden pt-4 border-t border-zinc-900 mt-auto transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
           <button 
               onClick={handleLogout}
               className="w-full bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-bold py-3 rounded-xl uppercase text-center block hover:bg-red-500/20 transition-colors cursor-pointer"
