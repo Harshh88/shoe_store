@@ -115,7 +115,7 @@ const getBookingShop = async (req, res) => {
     const shop = await getSingleShop({ shop_id });
     console.log(shop);
     res.status(200).json({
-      shop: shop.rows[0],
+      shop: shop,
     });
   } catch (err) {
     console.log(err);
