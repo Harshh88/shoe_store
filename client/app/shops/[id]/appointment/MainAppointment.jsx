@@ -12,7 +12,22 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
   const [loading, setLoading] = useState(false);
 
-  const name_parts = bookingShop?.name ? bookingShop.name.split(" ") : ["Shop"];
+  // SAFE DATA EXTRACTION: Agar backend ne response object direct nested shop key me bheja ho
+  const actualShopData = bookingShop?.shop ? bookingShop.shop : bookingShop;
+
+  // Shop basic information extraction
+  const shopName = actualShopData?.name || actualShopData?.shop_name || "Flagship Store";
+  const shopAddress = actualShopData?.address || "Address details Loading...";
+  const shopDescription = actualShopData?.description || "Welcome to our designated premium retail destination space.";
+  
+  // Dynamic image resolving logic with fallbacks
+  const resolvedShopImage = 
+    actualShopData?.shop_image || 
+    actualShopData?.url || 
+    actualShopData?.image_url || 
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop";
+
+  const name_parts = shopName.split(" ");
   const first_name = name_parts[0];
   const remain_name = name_parts.slice(1).join(" ");
 
@@ -101,13 +116,13 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
       <main className="max-w-[1400px] mx-auto px-4 pb-20">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-16 items-start mb-10 lg:mb-24 mt-2">
           <div className="w-full lg:col-span-7 relative group">
-            <div className="relative h-[240px] sm:h-[350px] lg:h-[500px] rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden border border-zinc-800/50 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="relative h-[240px] sm:h-[350px] lg:h-[500px] rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden border border-zinc-800/50 shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-zinc-950">
               
-              {/* FIX: Changed 'grayscale' to 'md:grayscale' so it stays colored on mobile/tablet */}
+              {/* FIXED: Removed ALL grayscale filters. Image will load in 100% full native color */}
               <img 
-                src={bookingShop.shop_image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
-                alt={bookingShop.name}
-                className="w-full h-full object-cover md:grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                src={resolvedShopImage} 
+                alt={shopName}
+                className="w-full h-full object-cover transition-transform duration-700 scale-105 group-hover:scale-100"
               />
               
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-60" />
@@ -128,10 +143,10 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
             <div className="space-y-3 sm:space-y-6 max-w-sm sm:max-w-md lg:max-w-sm">
               <div className="flex items-start gap-2.5 text-zinc-400">
                 <MapPin size={16} className="text-[#F7FFB0] shrink-0 mt-0.5" />
-                <span className="text-xs font-bold tracking-widest uppercase leading-tight">{bookingShop.address || "Address details Loading..."}</span>
+                <span className="text-xs font-bold tracking-widest uppercase leading-tight">{shopAddress}</span>
               </div>
               <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed font-medium">
-                {bookingShop.description || "No description provided."}
+                {shopDescription}
               </p>
             </div>
           </div>
