@@ -102,11 +102,14 @@ const BookingPage = ({ bookingShop, onBookingSubmit }) => {
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-16 items-start mb-10 lg:mb-24 mt-2">
           <div className="w-full lg:col-span-7 relative group">
             <div className="relative h-[240px] sm:h-[350px] lg:h-[500px] rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden border border-zinc-800/50 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              
+              {/* FIX: Changed 'grayscale' to 'md:grayscale' so it stays colored on mobile/tablet */}
               <img 
                 src={bookingShop.shop_image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff"} 
                 alt={bookingShop.name}
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                className="w-full h-full object-cover md:grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
               />
+              
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-60" />
             </div>
           </div>
