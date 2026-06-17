@@ -192,11 +192,12 @@ export default function NavBar({
                     )}
                     
                     <div className="flex flex-col gap-8 pt-12">
-                        <Link href="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-white text-lg font-bold">
+                        {/* FIX: Changed "Cart Container" text to "Shopping Cart" for premium aesthetic alignment */}
+                        <Link href="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-white text-lg font-bold group">
                             <span className="bg-[#F7FFB0] text-black text-xs font-black px-2.5 py-1 rounded-full shadow">
                                 {cartCount} Items
                             </span>
-                            <span>Cart Container</span>
+                            <span className="hover:text-[#F7FFB0] transition-colors">Shopping Cart</span>
                         </Link>
                         <div className="h-px bg-zinc-900 w-full" />
                         <ul className="flex flex-col gap-6 text-gray-400 text-lg font-semibold">
