@@ -7,7 +7,7 @@ const createTable = async () => {
             CREATE TABLE IF NOT EXISTS order_items(
              id SERIAL PRIMARY KEY,
              order_id INTEGER NOT NULL,
-             product_id INTEGER NOT NULL,
+             product_id INTEGER,
              shop_id INTEGER NOT NULL,
              quantity INTEGER NOT NULL,
              price NUMERIC(10,2)
