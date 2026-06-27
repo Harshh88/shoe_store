@@ -7,7 +7,7 @@ const createTable = async () => {
             CREATE TABLE IF NOT EXISTS order_items(
              id SERIAL PRIMARY KEY,
              order_id INTEGER NOT NULL,
-             product_id INTEGER NOT NULL,
+             product_id INTEGER,
              shop_id INTEGER NOT NULL,
              quantity INTEGER NOT NULL,
              price NUMERIC(10,2)
@@ -16,36 +16,28 @@ const createTable = async () => {
     );
 
     await pool.query(`
-      DO $$
-      BEGIN
-        -- Order Foreign Key Check & Apply
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.table_constraints
-          WHERE constraint_name = 'fk_order_items_order' AND table_name = 'order_items'
-        ) THEN
-          ALTER TABLE order_items ADD CONSTRAINT fk_order_items_order 
-          FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE;
-        END IF;
+      ALTER TABLE order_items ALTER COLUMN product_id DROP NOT NULL;
+    `);
 
-        -- Product Foreign Key Check & Apply
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.table_constraints
-          WHERE constraint_name = 'fk_order_items_product' AND table_name = 'order_items'
-        ) THEN
-          ALTER TABLE order_items ADD CONSTRAINT fk_order_items_product 
-          FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE;
-        END IF;
+    await pool.query(`
+      ALTER TABLE order_items DROP CONSTRAINT IF EXISTS fk_order_items_product;
+      ALTER TABLE order_items 
+      ADD CONSTRAINT fk_order_items_product 
+      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL;
+    `);
 
-        -- Shop Foreign Key Check & Apply
-        IF NOT EXISTS (
-          SELECT 1 FROM information_schema.table_constraints
-          WHERE constraint_name = 'fk_order_items_shop' AND table_name = 'order_items'
-        ) THEN
-          ALTER TABLE order_items ADD CONSTRAINT fk_order_items_shop 
-          FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE;
-        END IF;
-      END
-      $$;
+    await pool.query(`
+      ALTER TABLE order_items DROP CONSTRAINT IF EXISTS fk_order_items_order;
+      ALTER TABLE order_items 
+      ADD CONSTRAINT fk_order_items_order 
+      FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE;
+    `);
+
+    await pool.query(`
+      ALTER TABLE order_items DROP CONSTRAINT IF EXISTS fk_order_items_shop;
+      ALTER TABLE order_items 
+      ADD CONSTRAINT fk_order_items_shop 
+      FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE;
     `);
 
   } catch (err) {
